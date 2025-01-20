@@ -194,8 +194,11 @@ def H₁ : SimpleGraph ↑(G.neighborSet p) :=
 
 instance H₁AdjDecidableRel : DecidableRel (H₁ G p).Adj := by apply instDecidableComapAdj
 
-def H₂ :  SimpleGraph { v | v ≠ p ∧ v ∉ G.neighborSet p } :=
-  G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
+-- def H₂ :  SimpleGraph { v | v ≠ p ∧ v ∉ G.neighborSet p } :=
+--   G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
+
+def H₂ : SimpleGraph ↑(Gᶜ.neighborSet p) :=
+  G.induce (Gᶜ.neighborSet p)
 
 instance H₂AdjDecidableRel : DecidableRel (H₂ G p).Adj := by apply instDecidableComapAdj
 end FinNGraph
@@ -237,8 +240,10 @@ lemma cliqueNumMono : (H₁ G p).cliqueNum ≤ G.cliqueNum - 1 := by
     rw [← @Nat.sub_le_sub_iff_right 1 (sSup {n | ∃ s, G.IsNClique n s}) n.succ] at contra
     simp_all; linarith
     exact oneLeCN G
-    let S' : Finset (Fin N.succ) := insert p (S.map (Function.Embedding.subtype _))
-    use S'
+    use insert p (S.map (Function.Embedding.subtype _))
+    apply IsNClique.insert
+
+    --TODO: refactor this?
     simp [isNClique_iff, IsClique] at SClique ⊢
     apply And.intro
     · intros a ha b hb hab
@@ -248,7 +253,9 @@ lemma cliqueNumMono : (H₁ G p).cliqueNum ≤ G.cliqueNum - 1 := by
       simp[Set.Pairwise] at SClique
       have _ := SClique.left a ha ha_mem b hb hb_mem hab
       tauto
-    · sorry
+    · exact SClique.right
+
+    simp_all
 
 theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.succ ∧ G.degree p + RamseyOld x.succ y ≥ N := by
   intros xyGraphProp
