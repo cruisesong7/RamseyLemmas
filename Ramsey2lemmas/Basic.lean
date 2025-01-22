@@ -5,6 +5,12 @@ import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Data.Nat.Lattice
 
 namespace SimpleGraph
+@[reducible]
+def NaturalNumber : Type := Nat
+def thirtyEight : NaturalNumber := 38
+
+
+
 ------------------------------------------------- Unused code, will be deleted
 -- def cliqueNumFinite {V: Type} (G : SimpleGraph V) [Fintype V] [DecidableRel G.Adj] [DecidableEq V]: ℕ :=
 --   Finset.sup (Finset.univ.powerset) (λ s ↦ if G.IsNClique s.card s then s.card else 0)
@@ -76,12 +82,65 @@ lemma RamseyGraphMonotone : ∀ {N s t}, RamseyGraphProp N s t → ∀ {M}, N �
     have xNeqy : x ≠ y := by intro; simp_all
     simp_all; tauto
   }
+
+theorem GraphRamsey2 : ∀ k : ℕ, GraphRamsey 2 k.succ = k.succ := by
+  intros k
+  unfold GraphRamsey
+
+  have RamseyGraph2Monotone : ∀ M₁ M₂, M₁ ≤ M₂ → M₁ ∈ { N : ℕ | RamseyGraphProp N 2 k.succ } → M₂ ∈ { N : ℕ | RamseyGraphProp N 2 k.succ }
+  intros M₁ M₂ M₁leM₂
+  simp
+  intro M₁Ramsey
+  apply RamseyGraphMonotone M₁Ramsey M₁leM₂
+  sorry
+  -- rw [Nat.sInf_upward_closed_eq_succ_iff]
+  -- simp
+  -- apply And.intro
+  -- simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
+  -- intros G
+  -- rcases Finset.eq_empty_or_nonempty (G.edgeFinset) with GEmp| ⟨⟨x,y⟩, xyInG⟩
+
+  -- · rw [Finset.eq_empty_iff_forall_not_mem] at GEmp
+  --   right
+  --   use Finset.univ
+  --   simp_all
+  --   intros x y _
+  --   let e: Sym2 (Fin (k + 1)) := s(x, y)
+  --   have tmp := GEmp e
+  --   simp_all
+
+  -- · left
+  --   use {x,y}
+  --   simp[Finset.card_eq_two]
+  --   simp_all
+  --   apply And.intro
+  --   swap
+  --   · use x, y
+  --     simp
+  --     intro h
+  --     simp_all
+  --   · apply And.intro <;> intros <;> simp [xyInG, SimpleGraph.Adj.symm]
+
+  -- simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
+  -- use (⊥ : SimpleGraph (Fin k))
+  -- by_contra h
+  -- simp at h
+  -- rcases (h (SimpleGraph.Bot.adjDecidable (Fin k))) with ⟨_, ⟨_, h⟩⟩ | ⟨S, h⟩
+  -- rw [Finset.card_eq_two] at h
+  -- rcases h with ⟨_, _, _, _⟩
+  -- simp_all
+  -- have tmp := card_finset_fin_le S
+  -- rw [h , Nat.succ_eq_add_one] at tmp
+  -- simp at tmp
+
+  -- assumption
+  -- done
 ------------------------------------------------ RamseyOld
 section FintypeVGraph
 variable {V : Type*} (G : SimpleGraph V) (x y : ℕ)
 
 -- Define the Independence number for a SimpleGraph G
-noncomputable def indNum : ℕ := Gᶜ.cliqueNum
+noncomputable abbrev indNum : ℕ := Gᶜ.cliqueNum
 
 -- an (x,y)-graph on n vertices iff does not have clique of size x or independet set of size y
 def isXYGraph : Prop := G.cliqueNum < x ∧ G.indNum < y
@@ -126,12 +185,9 @@ lemma fintype_cliqueNum_bddAbove : BddAbove {n | ∃ s, G.IsNClique n s} := by
   rw [isNClique_iff] at syc
   rw [← syc.right]
   exact Finset.card_le_card (Finset.subset_univ s)
-end FintypeVGraph
 
-section FinNGraph
-variable (G : SimpleGraph (Fin N))
-lemma cliqueNumToNClique : G.cliqueNum < x ↔ ¬ ∃ S, G.IsNClique x S := by
-  simp[isNClique_iff]
+lemma cliqueNum2CliqueFree: G.cliqueNum < x ↔ G.CliqueFree x := by
+  simp [CliqueFree, isNClique_iff]
   apply Iff.intro
   · intros H_cliqueNum S SIsClique
     have tmp : S.card ≤ G.cliqueNum := @IsClique.card_le_cliqueNum  _ G _ S SIsClique
@@ -155,6 +211,11 @@ lemma cliqueNumToNClique : G.cliqueNum < x ↔ ¬ ∃ S, G.IsNClique x S := by
       simp_all
     · assumption
 
+end FintypeVGraph
+
+section FinNGraph
+variable (G : SimpleGraph (Fin N))
+
 theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [DecidableRel G.Adj], ¬ G.isXYGraph x y) ↔ RamseyGraphProp N x y := by
   simp [isXYGraph, RamseyGraphProp, indNum]
   apply Iff.intro <;> intros H G
@@ -162,20 +223,20 @@ theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [Dec
     by_contra RamseyProp
     by_cases H : G.cliqueNum < x
     · have H₁ := not_lt_of_le (cliqueNumProp H)
-      simp [cliqueNumToNClique] at H H₁
-      simp_all
-    · simp [cliqueNumToNClique] at H
-      simp_all
+      simp [cliqueNum2CliqueFree] at H H₁
+      simp_all [CliqueFree]
+    · simp [cliqueNum2CliqueFree] at H
+      simp_all [CliqueFree]
   · intro cliqueNumProp
     obtain ⟨S,SClique⟩ | ⟨T, TClique⟩ := H G
-    · rw [cliqueNumToNClique] at cliqueNumProp
-      simp_all
+    · rw [cliqueNum2CliqueFree] at cliqueNumProp
+      simp_all [CliqueFree]
     · by_contra H
-      simp [cliqueNumToNClique] at H
-      simp_all
+      simp [cliqueNum2CliqueFree] at H
+      simp_all [CliqueFree]
 
 --TODO: prove mono_RamseyOld
-theorem RamseyOldToRamsey : GraphRamsey x y = RamseyOld x y + 1 := by
+theorem GraphRamsey2RamseOld : GraphRamsey x y = RamseyOld x y + 1 := by
   simp [GraphRamsey]
   rw [Nat.sInf_upward_closed_eq_succ_iff]
   . simp_all
@@ -188,22 +249,18 @@ theorem RamseyOldToRamsey : GraphRamsey x y = RamseyOld x y + 1 := by
 
 ----------------------------------
 variable [DecidableRel G.Adj] (p : Fin N)
--- set_option diagnostics true
-def H₁ : SimpleGraph ↑(G.neighborSet p) :=
-  G.induce (G.neighborSet p)
 
+def H₁ : SimpleGraph ↑(G.neighborSet p) := G.induce (G.neighborSet p)
 instance H₁AdjDecidableRel : DecidableRel (H₁ G p).Adj := by apply instDecidableComapAdj
-
 -- def H₂ :  SimpleGraph { v | v ≠ p ∧ v ∉ G.neighborSet p } :=
 --   G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
-
-def H₂ : SimpleGraph ↑(Gᶜ.neighborSet p) :=
-  G.induce (Gᶜ.neighborSet p)
-
+def H₂ : SimpleGraph ↑(Gᶜ.neighborSet p) := G.induce (Gᶜ.neighborSet p)
 instance H₂AdjDecidableRel : DecidableRel (H₂ G p).Adj := by apply instDecidableComapAdj
+
 end FinNGraph
 
 section NonEmptyGraph
+
 variable {x y N : ℕ} (G : SimpleGraph (Fin N.succ))(p : Fin N.succ)
 -- set_option pp.explicit true
 lemma oneLeCN: 1 ≤ G.cliqueNum := by
@@ -324,30 +381,48 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
   assumption
   rw [← hp] at hb; simp [hb]
 
---TODO: add succ here ??
-noncomputable def v_i (x y i: ℕ) : ℕ := RamseyOld (x - 1) y - i
 
-theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x.succ y.succ i):
-  let e := G.edgeFinset.card
-  let e₁ := (H₁ G p).edgeFinset.card
-  let e₂ := (H₂ G p).edgeFinset.card
-  let s_i := λ i ↦ (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
-  let t_j := λ j ↦ (G.neighborSet p).toFinset.filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
-  e₂ - e₁ = RamseyOld x y.succ * (N.succ / 2 - RamseyOld x y.succ + i) + ∑ j in Finset.range (σ_G hxy), j.succ  * (t_j j.succ - (s_i j)/2) := by
+abbrev e₁ : ℕ := (H₁ G p).edgeFinset.card
+abbrev e₂ : ℕ := (H₂ G p).edgeFinset.card
+variable (x y i: ℕ)
+noncomputable abbrev v_i : ℕ := RamseyOld (x - 1) y - i --TODO: add succ here ??
+noncomputable abbrev s_i : ℕ := (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
+noncomputable abbrev t_i : ℕ := (G.neighborSet p).toFinset.filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
+
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x.succ y.succ i) : e₂ G p  - e₁ G p =
+RamseyOld x y.succ * (N.succ / 2 - RamseyOld x y.succ + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G p x y j.succ  - (s_i G x y j) / 2) := by
   sorry
 
-theorem Corollary₂ (G: SimpleGraph (Fin N.succ))[DecidableRel G.Adj]
-(hxy : G.isXYGraph 3 y.succ) (p: Fin N.succ) (hp: G.degree p = v_i 3 y.succ i) :
-  let e₂ := (H₂ G p).edgeFinset.card
-  let s_i := λ i ↦ (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
-  let t_j := λ j ↦ (G.neighborSet p).toFinset.filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
-  e₂ = y * (N.succ / 2 -  y + i) + ∑ j in Finset.range (σ_G hxy), j.succ  * (t_j j.succ - (s_i j) / 2) := by
-  have Prop₂ := Prop₂ G p hxy hp
-  simp_all
-  suffices tmp:  (Finset.filter (Membership.mem (H₁ G p).edgeSet) Finset.univ).card = 0 ∧ RamseyOld 2 y.succ = y
+theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 3 y.succ i) :
+  e₂ G p = y * (N.succ / 2 -  y + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G p 2 y j.succ - (s_i G 2 y j) / 2) := by
+  have Prop₂ := Prop₂ G p 2 y i hxy hp
+  suffices tmp: G.e₁ p = 0 ∧ RamseyOld 2 y.succ = y
   rw [tmp.left, tmp.right] at Prop₂
   simp_all
-  simp[Prop₂]
+  apply And.intro
+  · simp [Finset.filter_eq_empty_iff]
+    by_contra H
+    simp at H
+    obtain ⟨⟨u, v⟩, uvProp⟩ := H
+    simp [isXYGraph] at hxy
+    suffices : (G.H₁ p).cliqueNum < 2
+
+    simp [cliqueNum2CliqueFree, CliqueFree, isNClique_iff] at this
+    have contra := this {u,v}
+    simp [IsClique] at contra uvProp
+    simp [uvProp] at contra
+    rw [Finset.card_insert_of_not_mem] at contra
+    trivial
+
+    by_contra; simp_all
+
+    have H₁CliqueNum_UB := cliqueNumMono G p
+    simp[← Nat.sub_lt_sub_iff_right (oneLeCN G)] at hxy
+    linarith
+
+  · have tmp := GraphRamsey2 y
+    simp [GraphRamsey2RamseOld] at tmp
+    exact tmp
 
 theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (v_i 3 y i) ∧ G.degree v = (v_i 3 y i)):
   let p := Exists.choose h -- use classical.choose, is this bad?
