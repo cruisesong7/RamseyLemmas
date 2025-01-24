@@ -2,15 +2,11 @@ import Mathlib.Data.Rat.Init
 import Lean.Parser.Tactic
 import Mathlib.Tactic
 import Mathlib.Combinatorics.SimpleGraph.Clique
+import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Data.Nat.Lattice
 
+
 namespace SimpleGraph
-@[reducible]
-def NaturalNumber : Type := Nat
-def thirtyEight : NaturalNumber := 38
-
-
-
 ------------------------------------------------- Unused code, will be deleted
 -- def cliqueNumFinite {V: Type} (G : SimpleGraph V) [Fintype V] [DecidableRel G.Adj] [DecidableEq V]: ℕ :=
 --   Finset.sup (Finset.univ.powerset) (λ s ↦ if G.IsNClique s.card s then s.card else 0)
@@ -92,49 +88,50 @@ theorem GraphRamsey2 : ∀ k : ℕ, GraphRamsey 2 k.succ = k.succ := by
   simp
   intro M₁Ramsey
   apply RamseyGraphMonotone M₁Ramsey M₁leM₂
-  sorry
-  -- rw [Nat.sInf_upward_closed_eq_succ_iff]
-  -- simp
-  -- apply And.intro
-  -- simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
-  -- intros G
-  -- rcases Finset.eq_empty_or_nonempty (G.edgeFinset) with GEmp| ⟨⟨x,y⟩, xyInG⟩
+  rw [Nat.sInf_upward_closed_eq_succ_iff]
+  simp
+  apply And.intro
+  unfold RamseyGraphProp
+  intros G _
+  simp [SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
+  rcases Finset.eq_empty_or_nonempty (G.edgeFinset) with GEmp| ⟨⟨x,y⟩, xyInG⟩
 
-  -- · rw [Finset.eq_empty_iff_forall_not_mem] at GEmp
-  --   right
-  --   use Finset.univ
-  --   simp_all
-  --   intros x y _
-  --   let e: Sym2 (Fin (k + 1)) := s(x, y)
-  --   have tmp := GEmp e
-  --   simp_all
+  · rw [Finset.eq_empty_iff_forall_not_mem] at GEmp
+    right
+    use Finset.univ
+    simp_all
+    intros x y _
+    let e : Sym2 (Fin (k + 1)) := s(x, y)
+    have tmp := GEmp e
+    tauto
 
-  -- · left
-  --   use {x,y}
-  --   simp[Finset.card_eq_two]
-  --   simp_all
-  --   apply And.intro
-  --   swap
-  --   · use x, y
-  --     simp
-  --     intro h
-  --     simp_all
-  --   · apply And.intro <;> intros <;> simp [xyInG, SimpleGraph.Adj.symm]
+  · left
+    use {x,y}
+    simp[Finset.card_eq_two]
+    simp_all
+    apply And.intro
+    swap
+    · use x, y
+      simp
+      intro h
+      simp_all
+    · intros; simp [xyInG, SimpleGraph.Adj.symm];
 
-  -- simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
-  -- use (⊥ : SimpleGraph (Fin k))
-  -- by_contra h
-  -- simp at h
-  -- rcases (h (SimpleGraph.Bot.adjDecidable (Fin k))) with ⟨_, ⟨_, h⟩⟩ | ⟨S, h⟩
-  -- rw [Finset.card_eq_two] at h
-  -- rcases h with ⟨_, _, _, _⟩
-  -- simp_all
-  -- have tmp := card_finset_fin_le S
-  -- rw [h , Nat.succ_eq_add_one] at tmp
-  -- simp at tmp
+  simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
+  use (⊥ : SimpleGraph (Fin k))
+  simp
+  apply And.intro <;>
+  intros S HS
+  by_contra H
+  rw [Finset.card_eq_two] at H
+  obtain ⟨x, y, hxy⟩ := H
+  simp_all
 
-  -- assumption
-  -- done
+  have tmp := card_finset_fin_le S
+  rw [HS] at tmp
+  simp at tmp
+
+  assumption
 ------------------------------------------------ RamseyOld
 section FintypeVGraph
 variable {V : Type*} (G : SimpleGraph V) (x y : ℕ)
@@ -152,11 +149,12 @@ theorem Lemma₁ : G.isXYGraph x y ↔ Gᶜ.isXYGraph y x := by
   tauto
 
 variable [Fintype V]
-lemma cardLERamseyOld [DecidableRel G.Adj] [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
+lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
   intro
   simp [RamseyOld]
   apply le_csSup
   sorry
+
 ------------------------------------------------ RamseyOld <-> GraphRamsey
 variable {G}
 lemma exists_IsNClique_of_lt_cliqueNum  {n : ℕ} (h : n < G.cliqueNum) :
@@ -211,11 +209,6 @@ lemma cliqueNum2CliqueFree: G.cliqueNum < x ↔ G.CliqueFree x := by
       simp_all
     · assumption
 
-end FintypeVGraph
-
-section FinNGraph
-variable (G : SimpleGraph (Fin N))
-
 theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [DecidableRel G.Adj], ¬ G.isXYGraph x y) ↔ RamseyGraphProp N x y := by
   simp [isXYGraph, RamseyGraphProp, indNum]
   apply Iff.intro <;> intros H G
@@ -247,8 +240,28 @@ theorem GraphRamsey2RamseOld : GraphRamsey x y = RamseyOld x y + 1 := by
       sorry
     · sorry
 
+variable (i : ℕ) (G) [DecidableRel G.Adj]
+noncomputable abbrev v_i : ℕ := RamseyOld x y.succ - i --TODO: add succ here ??
+
+noncomputable abbrev s_i : ℕ := (Finset.univ).filter (λ v ↦ G.degree v = v_i x y i) |>.card
+noncomputable abbrev t_i (p : V): ℕ := (G.neighborFinset p).filter (λ v ↦ G.degree v = v_i x y i) |>.card
+
+variable {G x y}
+noncomputable def σ_G (_ : G.isXYGraph x.succ y.succ) : ℕ := RamseyOld x y.succ - G.minDegree
+
+--TODO: it makes more sense to make graph of fintype V
+lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : V, G.degree v = ∑ j ∈ Finset.range (σ_G hxy), G.s_i x y j * v_i x y j.succ := by
+  apply Finset.sum_bij
+  simp [σ_G]
+  intros v
+  sorry
+
+
+end FintypeVGraph
 ----------------------------------
-variable [DecidableRel G.Adj] (p : Fin N)
+
+section FinNGraph
+variable (G : SimpleGraph (Fin N))[DecidableRel G.Adj] (p : Fin N)
 
 def H₁ : SimpleGraph ↑(G.neighborSet p) := G.induce (G.neighborSet p)
 instance H₁AdjDecidableRel : DecidableRel (H₁ G p).Adj := by apply instDecidableComapAdj
@@ -256,6 +269,9 @@ instance H₁AdjDecidableRel : DecidableRel (H₁ G p).Adj := by apply instDecid
 --   G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
 def H₂ : SimpleGraph ↑(Gᶜ.neighborSet p) := G.induce (Gᶜ.neighborSet p)
 instance H₂AdjDecidableRel : DecidableRel (H₂ G p).Adj := by apply instDecidableComapAdj
+
+abbrev e₁ : ℕ := (H₁ G p).edgeFinset.card
+abbrev e₂ : ℕ := (H₂ G p).edgeFinset.card
 
 end FinNGraph
 
@@ -347,9 +363,7 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
     linarith
 
   -- let I_H1 := (G.neighborFinset p).map ⟨Subtype.val, Subtype.val_injective⟩
-variable {G} in
-noncomputable def σ_G (_ : G.isXYGraph x.succ y.succ) : ℕ :=
-  RamseyOld x y.succ - G.minDegree
+variable {G}
 
 theorem Prop₁ (hxy : G.isXYGraph x.succ y.succ):
 N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hxy) ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 -  N.succ := by
@@ -381,21 +395,29 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
   assumption
   rw [← hp] at hb; simp [hb]
 
+  -- intros
+  -- simp_all
+  -- tauto
+-- lemma H_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy), G.s_i x y j * v_i x y j.succ := by
+--   apply Finset.sum_bij
+--   sorry
+variable (x y i)
 
-abbrev e₁ : ℕ := (H₁ G p).edgeFinset.card
-abbrev e₂ : ℕ := (H₂ G p).edgeFinset.card
-variable (x y i: ℕ)
-noncomputable abbrev v_i : ℕ := RamseyOld (x - 1) y - i --TODO: add succ here ??
-noncomputable abbrev s_i : ℕ := (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
-noncomputable abbrev t_i : ℕ := (G.neighborSet p).toFinset.filter (λ v ↦ G.degree v = v_i x.succ y.succ i) |>.card
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x y i) : e₂ G p  - e₁ G p =
+RamseyOld x y.succ * (N.succ / 2 - RamseyOld x y.succ + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G x y j.succ p - (s_i G x y j) / 2) := by
+  let e := G.edgeFinset.card
 
-theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x.succ y.succ i) : e₂ G p  - e₁ G p =
-RamseyOld x y.succ * (N.succ / 2 - RamseyOld x y.succ + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G p x y j.succ  - (s_i G x y j) / 2) := by
-  sorry
+  have count₁ : e = ∑ j in Finset.range (σ_G hxy), (t_i G x y j) * (v_i x y j.succ) - e₁ G p + e₂ G p := by
+    sorry
+  have count₂ : 2 * e = ∑ j in Finset.range (σ_G hxy), (s_i G x y j) * (v_i x y j.succ) := by
+    simp only[e, ← sum_degrees_eq_twice_card_edges]
+    apply G_degreeCount_eq
 
-theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 3 y.succ i) :
-  e₂ G p = y * (N.succ / 2 -  y + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G p 2 y j.succ - (s_i G 2 y j) / 2) := by
-  have Prop₂ := Prop₂ G p 2 y i hxy hp
+  rw [count₁] at count₂
+
+theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 2 y i) :
+  e₂ G p = y * (N.succ / 2 - y + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G 2 y j.succ p - (s_i G 2 y j) / 2) := by
+  have Prop₂ := Prop₂ 2 y p i hxy hp
   suffices tmp: G.e₁ p = 0 ∧ RamseyOld 2 y.succ = y
   rw [tmp.left, tmp.right] at Prop₂
   simp_all
