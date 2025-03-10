@@ -5,50 +5,7 @@ import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Data.Nat.Lattice
 
-
 namespace SimpleGraph
-------------------------------------------------- Unused code, will be deleted
--- def cliqueNumFinite {V: Type} (G : SimpleGraph V) [Fintype V] [DecidableRel G.Adj] [DecidableEq V]: ℕ :=
---   Finset.sup (Finset.univ.powerset) (λ s ↦ if G.IsNClique s.card s then s.card else 0)
-
--- lemma cliqueNumFiniteToNClique (G : SimpleGraph (Fin N)) [DecidableRel G.Adj] (x: ℕ): G.cliqueNumFinite < x ↔ ¬ ∃ S, G.IsNClique x S := by
---   simp[cliqueNumFinite]
---   apply Iff.intro
---   · intro H_cliqueNum S
---     by_contra SClique
---     -- have xInSet : x ∈ {n | ∃ s, G.IsNClique n s} := by simp_all; use S
---     -- have tmp := le_sSup xInSet
---     -- have tmp := Finset.le_sup SInUniv
---     have SInUniv : S ∈ (Finset.univ : Finset (Finset (Fin N))) := by simp
---     have tmp : (fun s => if G.IsNClique s.card s then s.card else 0) S ≤ (Finset.univ.sup fun s => if G.IsNClique s.card s then s.card else 0) := by
---       apply Finset.le_sup SInUniv
---     simp_all[isNClique_iff]
---     exact not_lt_of_le tmp H_cliqueNum
---   · intro NotXClique
---     by_contra H
---     simp at H
---     -- Extract a set achieving the supremum
---     obtain ⟨S, SInUniv, SSup⟩ := Finset.exists_mem_eq_sup (Finset.univ : Finset (Finset (Fin N))) (by simp)
---       (fun s => if G.IsNClique s.card s then s.card else 0)
---     have SClique : G.IsNClique S.card S := by
---       split_ifs at SSup with h
---       · exact h
---       · simp_all
---     simp_all
-
--- Instance that proves induced subgraph from a graph with decidable adjacency is also decidable
---TODO: Maybe unnecessary (but useful for mathlib?) seems to be already in mathlib
--- instance inducedDecidableRel {N : ℕ} : ∀ (G : SimpleGraph (Fin N)) (s : Set (Fin N)) [DecidableRel G.Adj],
--- DecidableRel (G.induce s).Adj := by
---   intros
---   simp [induce]
---   tauto
-
--- noncomputable def I_H₁ {N:ℕ} (G : SimpleGraph (Fin N)) (p : Fin N) [DecidableRel G.Adj] : ℕ :=
---   (H₁ G p).indNum
-
--- def H₂ {N:ℕ} (G : SimpleGraph (Fin N)) [DecidableRel G.Adj](p : Fin N) :  SimpleGraph _ :=
---   G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
 
 ------------------------------------------------ GraphRamsey From Previous Project
 def RamseyGraphProp (N s t : ℕ) : Prop := (∀ (G : SimpleGraph (Fin N)) [DecidableRel G.Adj], (∃ S, G.IsNClique s S) ∨ (∃ T, Gᶜ.IsNClique t T))
@@ -76,7 +33,8 @@ lemma RamseyGraphMonotone : ∀ {N s t}, RamseyGraphProp N s t → ∀ {M}, N �
     simp [SProp.right]
     intros x _ y _ _
     have xNeqy : x ≠ y := by intro; simp_all
-    simp_all; tauto
+    simp_all
+    tauto
   }
 
 theorem GraphRamsey2 : ∀ k : ℕ, GraphRamsey 2 k.succ = k.succ := by
@@ -115,7 +73,8 @@ theorem GraphRamsey2 : ∀ k : ℕ, GraphRamsey 2 k.succ = k.succ := by
       simp
       intro h
       simp_all
-    · intros; simp [xyInG, SimpleGraph.Adj.symm];
+    · intros
+      simp [xyInG, SimpleGraph.Adj.symm]
 
   simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
   use (⊥ : SimpleGraph (Fin k))
@@ -189,7 +148,8 @@ lemma cliqueNum2CliqueFree: G.cliqueNum < x ↔ G.CliqueFree x := by
   apply Iff.intro
   · intros H_cliqueNum S SIsClique
     have tmp : S.card ≤ G.cliqueNum := @IsClique.card_le_cliqueNum  _ G _ S SIsClique
-    by_contra; linarith
+    by_contra
+    linarith
   · intro NotXClique
     obtain ⟨S, SMaxClique⟩ := G.maximumClique_exists
     have SCardEqCN := maximumClique_card_eq_cliqueNum S SMaxClique
@@ -249,13 +209,37 @@ noncomputable abbrev t_i (p : V): ℕ := (G.neighborFinset p).filter (λ v ↦ G
 variable {G x y}
 noncomputable def σ_G (_ : G.isXYGraph x.succ y.succ) : ℕ := RamseyOld x y.succ - G.minDegree
 
---TODO: it makes more sense to make graph of fintype V
-lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : V, G.degree v = ∑ j ∈ Finset.range (σ_G hxy), G.s_i x y j * v_i x y j.succ := by
-  apply Finset.sum_bij
-  simp [σ_G]
-  intros v
-  sorry
+lemma sum_degree_eq_sum_over_degrees :
+  ∑ v : V, G.degree v =
+    ∑ d in Finset.image (λ v => G.degree v) Finset.univ, d * ((Finset.univ).filter (λ v => G.degree v = d)).card := by
 
+    have h_sigma : (∑ v: V, G.degree v) =
+    ∑ p in Finset.sigma (Finset.image (λ v => G.degree v) Finset.univ) (λ d => Finset.univ.filter (λ v =>  G.degree v = d)), G.degree p.2 := by
+      apply Finset.sum_bij (λ v hv => ⟨G.degree v, v⟩) <;> simp
+      intros p _ _ h
+      use p.2
+      rw [h]
+
+    rw [h_sigma]
+
+    have h_inner_sum : ∀ d ∈ (Finset.image (λ v => G.degree v) Finset.univ),
+    (∑ v in (Finset.univ.filter (λ v => G.degree v = d)), G.degree v) =
+    d * ((Finset.univ).filter (λ v => G.degree v = d)).card := by
+      intros d hd
+      have h : ∀ v ∈ (Finset.univ.filter (λ v => G.degree v = d)), G.degree v = d := by
+        intros v hv
+        rw [Finset.mem_filter] at hv
+        rcases hv with ⟨hv1, hv2⟩
+        rw [hv2]
+      rw [Finset.sum_const_nat h]
+      apply mul_comm
+
+    suffices:
+      (∑ p in Finset.sigma  (Finset.image (λ v => G.degree v) Finset.univ) (λ d => Finset.univ.filter (λ v => G.degree v = d)), G.degree p.2) =
+      (∑ d in (Finset.image (λ v => G.degree v) Finset.univ), ∑ v in Finset.univ.filter (λ v =>  G.degree v = d), G.degree v)
+    rw[this]
+    apply Finset.sum_congr rfl h_inner_sum
+    simp [Finset.sum_sigma']
 
 end FintypeVGraph
 ----------------------------------
@@ -265,8 +249,7 @@ variable (G : SimpleGraph (Fin N))[DecidableRel G.Adj] (p : Fin N)
 
 def H₁ : SimpleGraph ↑(G.neighborSet p) := G.induce (G.neighborSet p)
 instance H₁AdjDecidableRel : DecidableRel (H₁ G p).Adj := by apply instDecidableComapAdj
--- def H₂ :  SimpleGraph { v | v ≠ p ∧ v ∉ G.neighborSet p } :=
---   G.induce (λ v ↦ v ≠ p ∧ v ∉ G.neighborSet p)
+
 def H₂ : SimpleGraph ↑(Gᶜ.neighborSet p) := G.induce (Gᶜ.neighborSet p)
 instance H₂AdjDecidableRel : DecidableRel (H₂ G p).Adj := by apply instDecidableComapAdj
 
@@ -281,7 +264,8 @@ variable {x y N : ℕ} (G : SimpleGraph (Fin N.succ))(p : Fin N.succ)
 -- set_option pp.explicit true
 lemma oneLeCN: 1 ≤ G.cliqueNum := by
   apply le_csSup fintype_cliqueNum_bddAbove
-  simp; tauto
+  simp
+  tauto
 
 lemma indNumMono : (H₁ G p).indNum ≤ G.indNum := by
   simp [indNum, cliqueNum]
@@ -305,7 +289,7 @@ variable [DecidableRel G.Adj]
 lemma cliqueNumMono : (H₁ G p).cliqueNum ≤ G.cliqueNum - 1 := by
     simp [cliqueNum]
     rw [csSup_le_iff' fintype_cliqueNum_bddAbove]
-    by_contra H; simp at H
+    by_contra! H
     obtain ⟨n, ⟨ S, SClique⟩, SProp⟩ := H
     suffices : ∃ s, G.IsNClique n.succ s
     have tmp : n.succ ∈ {n | ∃ s, G.IsNClique n s} := by simp[this]
@@ -361,6 +345,53 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
     have _ := G.degree_compl
     simp_all
     linarith
+theorem tmp: ((⊥ : (SimpleGraph (Fin (2).succ)) ) = (⊥ :(SimpleGraph (Fin (2 + 1))) )) ↔ true := by
+apply Iff.intro
+intro
+rfl
+intro
+rfl
+
+
+lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.s_i x y j * v_i x y j := by
+  rw [sum_degree_eq_sum_over_degrees]
+
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intro a
+    have _ := G.minDegree_le_degree a
+    omega
+  · simp
+    intros a₁ a₂ h
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb
+    rw [Nat.lt_succ_iff] at hb
+
+    obtain ⟨a, ha⟩ : ∃ a : Fin N.succ, G.degree a = RamseyOld x (y + 1) - b := by sorry
+--       have tmp :  RamseyOld x (y + 1) - b ∈ Set.range (λ v : Fin N.succ ↦ G.degree v) := by
+
+-- ]        sorry
+--       rwa [Set.mem_range] at tmp
+      -- by_contra!
+      -- have tmp : ∀ (a : Fin N.succ), G.degree a < RamseyOld x (y + 1) - b ∨ G.degree a > RamseyOld x (y + 1) - b := by
+      --   intro a
+      --   specialize this a
+      --   rw [ne_iff_lt_or_gt] at this
+      --   exact this
+      -- rcases tmp
+
+    use a
+    rw [ha, Nat.sub_sub_self]
+    omega
+  · simp [s_i, v_i]
+    intros a
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    simp[tmp, mul_comm]
 
   -- let I_H1 := (G.neighborFinset p).map ⟨Subtype.val, Subtype.val_injective⟩
 variable {G}
@@ -395,25 +426,92 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
   assumption
   rw [← hp] at hb; simp [hb]
 
-  -- intros
-  -- simp_all
-  -- tauto
--- lemma H_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy), G.s_i x y j * v_i x y j.succ := by
---   apply Finset.sum_bij
---   sorry
 variable (x y i)
 
-theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x y i) : e₂ G p  - e₁ G p =
-RamseyOld x y.succ * (N.succ / 2 - RamseyOld x y.succ + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G x y j.succ p - (s_i G x y j) / 2) := by
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x y i) : 2 * (↑(e₂ G p  - e₁ G p) : ℤ ) =
+RamseyOld x y.succ * (N.succ - 2 * RamseyOld x y.succ + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 * t_i G x y j p - (s_i G x y j)) := by
   let e := G.edgeFinset.card
+  let lhs := ∑ j in Finset.range (σ_G hxy).succ, (t_i G x y j p) * (v_i x y j)
+  let rhs := ∑ j in Finset.range (σ_G hxy).succ, (s_i G x y j) * (v_i x y j)
 
-  have count₁ : e = ∑ j in Finset.range (σ_G hxy), (t_i G x y j) * (v_i x y j.succ) - e₁ G p + e₂ G p := by
+  have count₁ : e = lhs - e₁ G p + e₂ G p := by
     sorry
-  have count₂ : 2 * e = ∑ j in Finset.range (σ_G hxy), (s_i G x y j) * (v_i x y j.succ) := by
+
+  have count₂ : 2 * e = rhs := by
+    -- suffices : 2 * e = rhs
     simp only[e, ← sum_degrees_eq_twice_card_edges]
     apply G_degreeCount_eq
 
   rw [count₁] at count₂
+
+  have count₂ : 2 * (G.e₂ p - G.e₁ p) = rhs - 2 * lhs := by
+    have tmp : G.e₁ p ≤ lhs := by sorry
+    rw [← Nat.sub_add_comm tmp] at count₂
+    omega
+  zify at count₂ -- Pretty difficult to think of the correct type coercion
+  conv at count₂ =>
+    rhs
+    unfold lhs rhs
+    rw [Finset.mul_sum]
+    rw [Nat.cast_sub (by sorry), Nat.cast_sum, Nat.cast_sum]
+    simp[v_i]
+
+  --hard to work with under conv, easier to show bijective
+  have part₁ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * (↑(RamseyOld x (y + 1) - x_1):ℤ)
+  =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (↑(G.s_i x y x_1) * (↑(RamseyOld x (y + 1)): ℤ) - ↑(G.s_i x y x_1) * x_1) := by
+    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+    intros a ha
+    rw[Nat.cast_sub (by sorry)]
+    linarith
+  rw[Finset.sum_sub_distrib] at part₁
+  rw [← Finset.sum_mul] at part₁
+  have tmp₁ : (∑ i ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y i):ℤ) = N.succ := by sorry
+  rw [tmp₁] at part₁
+
+    --hard to work with under conv, easier to show bijective
+  have part₂ :  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * (↑(G.t_i x y x_1 p) * ↑(RamseyOld x (y + 1) - x_1):ℤ)
+  =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.t_i x y x_1 p) * (↑(RamseyOld x (y + 1)): ℤ) - 2 * ↑(G.t_i x y x_1 p) * x_1) := by
+    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+    intros a ha
+    rw[Nat.cast_sub (by sorry)]
+    linarith
+  rw [Finset.sum_sub_distrib] at part₂
+  rw [← Finset.sum_mul] at part₂
+  have tmp₂ : (∑ i ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y i p): ℤ) = 2 * v_i x y i := by sorry
+  rw [tmp₂] at part₂
+
+  rw [part₁, part₂] at count₂
+  rw [count₂]
+  simp
+  rw [sub_sub_sub_comm]
+  rw [sub_sub_eq_add_sub, add_sub_assoc]
+  rw [← Finset.sum_sub_distrib]
+
+  have _ :  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ↑(G.s_i x y x_1) * ↑x_1) = ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑x_1 * ↑(2 * G.t_i x y x_1 p - G.s_i x y x_1) :=  by
+    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+    intros a ha
+    zify
+    rw[Nat.cast_sub (by sorry), Nat.cast_sub (by sorry)]
+    rw [mul_sub,  Nat.cast_mul]
+    ring
+
+
+  -- simp [← Int.sub_sub]
+  -- suffices : ↑N.succ * ↑(RamseyOld x (y + 1)) - (2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))) = ↑(RamseyOld x (y + 1)) * (N.succ - 2 * ↑(v_i x y i))
+  -- simp [this]
+  -- have _  : (↑N + 1) * ↑(RamseyOld x (y + 1)) - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))
+  --   = (↑N + 1) * ↑(RamseyOld x (y + 1)) - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by
+  --   norm_cast
+  --   have _ : (N + 1) * RamseyOld x (y + 1) ≥ 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) := by sorry
+  --   have _ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 ≥ ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by sorry
+  --   linarith
+
+-- calc   (↑N + 1) * ↑(RamseyOld x (y + 1)) - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))
+--     = (↑N + 1) * ↑(RamseyOld x (y + 1))  - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by rfl
+--    _ = ↑(RamseyOld x (y + 1)) * ((↑N + 1) - 2 * ↑(v_i x y i))  := by rfl
+--    _ =   ↑(RamseyOld x (y + 1)) * (↑N + 1 - 2 * ↑(RamseyOld x (y + 1)) + 2 * ↑i) +
+--     ∑ x_1 ∈ Finset.range (σ_G hxy), (↑x_1 + 1) * ↑(2 * G.t_i x y (x_1 + 1) p - G.s_i x y x_1) := by sorry
+
 
 theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 2 y i) :
   e₂ G p = y * (N.succ / 2 - y + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G 2 y j.succ p - (s_i G 2 y j) / 2) := by
@@ -436,7 +534,8 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 2 y i) 
     rw [Finset.card_insert_of_not_mem] at contra
     trivial
 
-    by_contra; simp_all
+    by_contra
+    simp_all
 
     have H₁CliqueNum_UB := cliqueNumMono G p
     simp[← Nat.sub_lt_sub_iff_right (oneLeCN G)] at hxy
