@@ -201,7 +201,7 @@ theorem GraphRamsey2RamseOld : GraphRamsey x y = RamseyOld x y + 1 := by
     · sorry
 
 variable (i : ℕ) (G) [DecidableRel G.Adj]
-noncomputable abbrev v_i : ℕ := RamseyOld x y.succ - i --TODO: add succ here ??
+noncomputable abbrev v_i : ℤ := RamseyOld x y.succ - i
 
 noncomputable abbrev s_i : ℕ := (Finset.univ).filter (λ v ↦ G.degree v = v_i x y i) |>.card
 noncomputable abbrev t_i (p : V): ℕ := (G.neighborFinset p).filter (λ v ↦ G.degree v = v_i x y i) |>.card
@@ -345,17 +345,10 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
     have _ := G.degree_compl
     simp_all
     linarith
-theorem tmp: ((⊥ : (SimpleGraph (Fin (2).succ)) ) = (⊥ :(SimpleGraph (Fin (2 + 1))) )) ↔ true := by
-apply Iff.intro
-intro
-rfl
-intro
-rfl
-
 
 lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.s_i x y j * v_i x y j := by
   rw [sum_degree_eq_sum_over_degrees]
-
+  push_cast
   apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
   · simp[σ_G]
     intro a
@@ -392,6 +385,7 @@ lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G
       rw [Nat.sub_sub_self]
       exact (Lemma₂ G a hxy).left
     simp[tmp, mul_comm]
+    sorry
 
   -- let I_H1 := (G.neighborFinset p).map ⟨Subtype.val, Subtype.val_injective⟩
 variable {G}
@@ -428,8 +422,8 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
 
 variable (x y i)
 
-theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x y i) : 2 * (↑(e₂ G p  - e₁ G p) : ℤ ) =
-RamseyOld x y.succ * (N.succ - 2 * RamseyOld x y.succ + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 * t_i G x y j p - (s_i G x y j)) := by
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = v_i x y i) : 2 * ((↑(e₂ G p)  - ↑(e₁ G p))) =
+RamseyOld x y.succ * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i) + ∑ j in Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑(t_i G x y j p) - ↑(s_i G x y j)) := by
   let e := G.edgeFinset.card
   let lhs := ∑ j in Finset.range (σ_G hxy).succ, (t_i G x y j p) * (v_i x y j)
   let rhs := ∑ j in Finset.range (σ_G hxy).succ, (s_i G x y j) * (v_i x y j)
@@ -438,43 +432,39 @@ RamseyOld x y.succ * (N.succ - 2 * RamseyOld x y.succ + 2 * i) + ∑ j in Finset
     sorry
 
   have count₂ : 2 * e = rhs := by
-    -- suffices : 2 * e = rhs
+    norm_cast
     simp only[e, ← sum_degrees_eq_twice_card_edges]
     apply G_degreeCount_eq
 
   rw [count₁] at count₂
 
-  have count₂ : 2 * (G.e₂ p - G.e₁ p) = rhs - 2 * lhs := by
+  have count₂ : 2 * (G.e₂ p - G.e₁ p) = ↑rhs - 2 * (↑lhs : ℤ) := by
     have tmp : G.e₁ p ≤ lhs := by sorry
-    rw [← Nat.sub_add_comm tmp] at count₂
     omega
-  zify at count₂ -- Pretty difficult to think of the correct type coercion
   conv at count₂ =>
     rhs
     unfold lhs rhs
-    rw [Finset.mul_sum]
-    rw [Nat.cast_sub (by sorry), Nat.cast_sum, Nat.cast_sum]
     simp[v_i]
 
   --hard to work with under conv, easier to show bijective
-  have part₁ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * (↑(RamseyOld x (y + 1) - x_1):ℤ)
+  have part₁ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
   =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (↑(G.s_i x y x_1) * (↑(RamseyOld x (y + 1)): ℤ) - ↑(G.s_i x y x_1) * x_1) := by
     apply Finset.sum_bij (λ a ha ↦ a) <;> simp
     intros a ha
-    rw[Nat.cast_sub (by sorry)]
     linarith
+
   rw[Finset.sum_sub_distrib] at part₁
   rw [← Finset.sum_mul] at part₁
-  have tmp₁ : (∑ i ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y i):ℤ) = N.succ := by sorry
+  have tmp₁ : (∑ i ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y i) : ℤ ) = N.succ := by sorry
   rw [tmp₁] at part₁
 
-    --hard to work with under conv, easier to show bijective
-  have part₂ :  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * (↑(G.t_i x y x_1 p) * ↑(RamseyOld x (y + 1) - x_1):ℤ)
+  have part₂ :    2 * ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.t_i x y x_1 p) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
   =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.t_i x y x_1 p) * (↑(RamseyOld x (y + 1)): ℤ) - 2 * ↑(G.t_i x y x_1 p) * x_1) := by
+    rw[Finset.mul_sum]
     apply Finset.sum_bij (λ a ha ↦ a) <;> simp
     intros a ha
-    rw[Nat.cast_sub (by sorry)]
     linarith
+
   rw [Finset.sum_sub_distrib] at part₂
   rw [← Finset.sum_mul] at part₂
   have tmp₂ : (∑ i ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y i p): ℤ) = 2 * v_i x y i := by sorry
@@ -482,39 +472,23 @@ RamseyOld x y.succ * (N.succ - 2 * RamseyOld x y.succ + 2 * i) + ∑ j in Finset
 
   rw [part₁, part₂] at count₂
   rw [count₂]
-  simp
   rw [sub_sub_sub_comm]
   rw [sub_sub_eq_add_sub, add_sub_assoc]
   rw [← Finset.sum_sub_distrib]
 
-  have _ :  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ↑(G.s_i x y x_1) * ↑x_1) = ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑x_1 * ↑(2 * G.t_i x y x_1 p - G.s_i x y x_1) :=  by
+  have part₁ : ↑N.succ * ↑(RamseyOld x (y + 1)) - (2 * ↑(v_i x y i)) * ↑(RamseyOld x (y + 1)) =  ↑(RamseyOld x y.succ) * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i : ℤ) := by
+    rw [v_i]
+    rw [← mul_sub_right_distrib]
+    linarith
+
+  have part₂ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ↑(G.s_i x y x_1) * ↑x_1 : ℤ) = ∑ j ∈ Finset.range (σ_G hxy).succ, ↑j * (2 * ↑(G.t_i x y j p) - ↑(G.s_i x y j): ℤ) := by
     apply Finset.sum_bij (λ a ha ↦ a) <;> simp
     intros a ha
-    zify
-    rw[Nat.cast_sub (by sorry), Nat.cast_sub (by sorry)]
-    rw [mul_sub,  Nat.cast_mul]
-    ring
-
-
-  -- simp [← Int.sub_sub]
-  -- suffices : ↑N.succ * ↑(RamseyOld x (y + 1)) - (2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))) = ↑(RamseyOld x (y + 1)) * (N.succ - 2 * ↑(v_i x y i))
-  -- simp [this]
-  -- have _  : (↑N + 1) * ↑(RamseyOld x (y + 1)) - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))
-  --   = (↑N + 1) * ↑(RamseyOld x (y + 1)) - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by
-  --   norm_cast
-  --   have _ : (N + 1) * RamseyOld x (y + 1) ≥ 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) := by sorry
-  --   have _ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 ≥ ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by sorry
-  --   linarith
-
--- calc   (↑N + 1) * ↑(RamseyOld x (y + 1)) - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1))
---     = (↑N + 1) * ↑(RamseyOld x (y + 1))  - 2 * ↑(v_i x y i) * ↑(RamseyOld x (y + 1)) + ∑ x_1 ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y x_1 p) * ↑x_1 - ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y x_1) * ↑x_1 := by rfl
---    _ = ↑(RamseyOld x (y + 1)) * ((↑N + 1) - 2 * ↑(v_i x y i))  := by rfl
---    _ =   ↑(RamseyOld x (y + 1)) * (↑N + 1 - 2 * ↑(RamseyOld x (y + 1)) + 2 * ↑i) +
---     ∑ x_1 ∈ Finset.range (σ_G hxy), (↑x_1 + 1) * ↑(2 * G.t_i x y (x_1 + 1) p - G.s_i x y x_1) := by sorry
-
+    linarith
+  rw[part₁, part₂]
 
 theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 2 y i) :
-  e₂ G p = y * (N.succ / 2 - y + i) + ∑ j in Finset.range (σ_G hxy), j.succ * (t_i G 2 y j.succ p - (s_i G 2 y j) / 2) := by
+  2 * e₂ G p = ↑y * ((↑N.succ) - 2 * ↑y + 2 * ↑i) + ∑ j in Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑ (t_i G 2 y j p) - ↑(s_i G 2 y j)) := by
   have Prop₂ := Prop₂ 2 y p i hxy hp
   suffices tmp: G.e₁ p = 0 ∧ RamseyOld 2 y.succ = y
   rw [tmp.left, tmp.right] at Prop₂
