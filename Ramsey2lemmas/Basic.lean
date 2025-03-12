@@ -348,44 +348,57 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
 
 lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.s_i x y j * v_i x y j := by
   rw [sum_degree_eq_sum_over_degrees]
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.s_i x y j > 0) , G.s_i x y j * v_i x y j)
   push_cast
   apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
   · simp[σ_G]
     intro a
+    apply And.intro
     have _ := G.minDegree_le_degree a
     omega
+    simp [Finset.Nonempty, v_i]
+    use a
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
   · simp
     intros a₁ a₂ h
     have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
     have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
     omega
   · simp[σ_G]
-    intros b hb
+    intros b hb h
     rw [Nat.lt_succ_iff] at hb
-
-    obtain ⟨a, ha⟩ : ∃ a : Fin N.succ, G.degree a = RamseyOld x (y + 1) - b := by sorry
---       have tmp :  RamseyOld x (y + 1) - b ∈ Set.range (λ v : Fin N.succ ↦ G.degree v) := by
-
--- ]        sorry
---       rwa [Set.mem_range] at tmp
-      -- by_contra!
-      -- have tmp : ∀ (a : Fin N.succ), G.degree a < RamseyOld x (y + 1) - b ∨ G.degree a > RamseyOld x (y + 1) - b := by
-      --   intro a
-      --   specialize this a
-      --   rw [ne_iff_lt_or_gt] at this
-      --   exact this
-      -- rcases tmp
-
+    simp[Finset.Nonempty, v_i] at h
+    obtain ⟨a, ha⟩ := h
     use a
-    rw [ha, Nat.sub_sub_self]
-    omega
-  · simp [s_i, v_i]
+    zify
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [v_i]
     intros a
     have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
       rw [Nat.sub_sub_self]
       exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
     simp[tmp, mul_comm]
-    sorry
+    by_cases aeq0 : G.degree a = 0
+    right
+    exact aeq0
+    left
+    simp[s_i, v_i]
+    suffices : (Finset.filter (fun v => G.degree v = G.degree a) Finset.univ) = (Finset.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+      Finset.univ)
+    rw[this]
+    apply Finset.filter_congr
+    rw[tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.s_i x y j > 0) (λ j ↦ ↑(G.s_i x y j) * v_i x y j)]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    left
+    assumption
 
   -- let I_H1 := (G.neighborFinset p).map ⟨Subtype.val, Subtype.val_injective⟩
 variable {G}
