@@ -189,7 +189,7 @@ theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [Dec
       simp_all [CliqueFree]
 
 --TODO: prove mono_RamseyOld
-theorem GraphRamsey2RamseOld : GraphRamsey x y = RamseyOld x y + 1 := by
+theorem GraphRamsey2RamseyOld : GraphRamsey x y = RamseyOld x y + 1 := by
   simp [GraphRamsey]
   rw [Nat.sInf_upward_closed_eq_succ_iff]
   . simp_all
@@ -516,7 +516,7 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = v_i 2 y i) 
     linarith
 
   · have tmp := GraphRamsey2 y
-    simp [GraphRamsey2RamseOld] at tmp
+    simp [GraphRamsey2RamseyOld] at tmp
     exact tmp
 
 theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (v_i 3 y i) ∧ G.degree v = (v_i 3 y i)):
