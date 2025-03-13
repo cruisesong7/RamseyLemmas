@@ -468,7 +468,25 @@ RamseyOld x y.succ * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i) + ∑ 
 
   rw[Finset.sum_sub_distrib] at part₁
   rw [← Finset.sum_mul] at part₁
-  have tmp₁ : (∑ i ∈ Finset.range (σ_G hxy + 1), ↑(G.s_i x y i) : ℤ ) = N.succ := by sorry
+  have tmp₁ : (∑ i ∈ Finset.range (σ_G hxy + 1), G.s_i x y i ) = N.succ := by sorry
+  --   transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ ∃ v : Fin N.succ, j = G.degree v) , G.s_i x y j)
+  --   · sorry
+  --   · transitivity (∑ j ∈ Finset.range (N.succ) , 1)
+  --     . apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+  --       intros a ha v hv
+  --       rw [σ_G] at ha
+  --       have h := SimpleGraph.degree_lt_card_verts G
+  --       specialize h v
+  --       simp[Fintype.card_eq] at h
+  --       omega
+
+        -- intros _ _ v _ _ _ w _ _
+        -- have _ := minDegree_le_degree G v
+        -- have _ := minDegree_le_degree G w
+        -- omega
+
+        -- intros b hb
+  zify at tmp₁
   rw [tmp₁] at part₁
 
   have part₂ :    2 * ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.t_i x y x_1 p) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
