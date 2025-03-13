@@ -5,93 +5,10 @@ import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Data.Nat.Lattice
 
+import FormalRamsey.Ramsey2Color
+
 namespace SimpleGraph
 
------------------------------------------------- GraphRamsey From Previous Project
-def RamseyGraphProp (N s t : ℕ) : Prop := (∀ (G : SimpleGraph (Fin N)) [DecidableRel G.Adj], (∃ S, G.IsNClique s S) ∨ (∃ T, Gᶜ.IsNClique t T))
-
-noncomputable def GraphRamsey (s t : ℕ) : ℕ := sInf { N : ℕ | RamseyGraphProp N s t }
-
-lemma RamseyGraphMonotone : ∀ {N s t}, RamseyGraphProp N s t → ∀ {M}, N ≤ M → RamseyGraphProp M s t := by
-  unfold RamseyGraphProp
-  intros N s t R M NleqM G _
-  let subAdj : Fin N → Fin N → Prop := λ u v ↦ G.Adj (Fin.castLE NleqM u) (Fin.castLE NleqM v)
-  have subAdjSym : Symmetric subAdj := by
-    unfold Symmetric
-    simp only [subAdj]
-    intros _ _ xAdjy
-    simp only [Adj.symm xAdjy]
-  have subAdjLoopless : Irreflexive subAdj := by
-    unfold Irreflexive
-    simp [subAdj]
-  let G' : SimpleGraph (Fin N) := { Adj := subAdj, symm := subAdjSym, loopless := subAdjLoopless }
-  rcases R G' with ⟨S, SProp⟩ | ⟨S, SProp⟩
-  left; swap; right
-  all_goals{
-    use S.map (Fin.castLEEmb NleqM)
-    simp [isNClique_iff, IsClique, Set.Pairwise] at SProp ⊢
-    simp [SProp.right]
-    intros x _ y _ _
-    have xNeqy : x ≠ y := by intro; simp_all
-    simp_all
-    tauto
-  }
-
-theorem GraphRamsey2 : ∀ k : ℕ, GraphRamsey 2 k.succ = k.succ := by
-  intros k
-  unfold GraphRamsey
-
-  have RamseyGraph2Monotone : ∀ M₁ M₂, M₁ ≤ M₂ → M₁ ∈ { N : ℕ | RamseyGraphProp N 2 k.succ } → M₂ ∈ { N : ℕ | RamseyGraphProp N 2 k.succ }
-  intros M₁ M₂ M₁leM₂
-  simp
-  intro M₁Ramsey
-  apply RamseyGraphMonotone M₁Ramsey M₁leM₂
-  rw [Nat.sInf_upward_closed_eq_succ_iff]
-  simp
-  apply And.intro
-  unfold RamseyGraphProp
-  intros G _
-  simp [SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
-  rcases Finset.eq_empty_or_nonempty (G.edgeFinset) with GEmp| ⟨⟨x,y⟩, xyInG⟩
-
-  · rw [Finset.eq_empty_iff_forall_not_mem] at GEmp
-    right
-    use Finset.univ
-    simp_all
-    intros x y _
-    let e : Sym2 (Fin (k + 1)) := s(x, y)
-    have tmp := GEmp e
-    tauto
-
-  · left
-    use {x,y}
-    simp[Finset.card_eq_two]
-    simp_all
-    apply And.intro
-    swap
-    · use x, y
-      simp
-      intro h
-      simp_all
-    · intros
-      simp [xyInG, SimpleGraph.Adj.symm]
-
-  simp [RamseyGraphProp, SimpleGraph.isNClique_iff, SimpleGraph.IsClique, Set.Pairwise]
-  use (⊥ : SimpleGraph (Fin k))
-  simp
-  apply And.intro <;>
-  intros S HS
-  by_contra H
-  rw [Finset.card_eq_two] at H
-  obtain ⟨x, y, hxy⟩ := H
-  simp_all
-
-  have tmp := card_finset_fin_le S
-  rw [HS] at tmp
-  simp at tmp
-
-  assumption
------------------------------------------------- RamseyOld
 section FintypeVGraph
 variable {V : Type*} (G : SimpleGraph V) (x y : ℕ)
 
@@ -112,7 +29,11 @@ lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ R
   intro
   simp [RamseyOld]
   apply le_csSup
-  sorry
+  · simp [BddAbove, upperBounds, Set.Nonempty]
+    rcases (Ramsey₂Finite x y) with ⟨N, NRamsey⟩
+    simp at NRamsey
+    sorry
+  · sorry
 
 ------------------------------------------------ RamseyOld <-> GraphRamsey
 variable {G}
@@ -199,6 +120,9 @@ theorem GraphRamsey2RamseyOld : GraphRamsey x y = RamseyOld x y + 1 := by
       by_contra H
       sorry
     · sorry
+  · simp
+    intro M N MleqN MRamsey
+    exact RamseyGraphMonotone MRamsey MleqN
 
 variable (i : ℕ) (G) [DecidableRel G.Adj]
 noncomputable abbrev v_i : ℤ := RamseyOld x y.succ - i
