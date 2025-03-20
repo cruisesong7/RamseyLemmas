@@ -25,52 +25,40 @@ theorem Lemma₁ : G.isXYGraph x y ↔ Gᶜ.isXYGraph y x := by
   tauto
 
 variable [Fintype V]
-lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
-  intro
-  simp [RamseyOld]
-  apply le_csSup
-  · simp [BddAbove, upperBounds, Set.Nonempty]
-    rcases (Ramsey₂Finite x y) with ⟨N, NRamsey⟩
-    simp at NRamsey
-    sorry
-  · sorry
 
------------------------------------------------- RamseyOld <-> GraphRamsey
-variable {G}
-lemma exists_IsNClique_of_lt_cliqueNum  {n : ℕ} (h : n < G.cliqueNum) :
-{n | ∃ s, G.IsNClique n s}.Nonempty → ∃ S : Finset V, G.IsNClique n S := by
-    intro h'
-    simp [cliqueNum] at h
-    rw [lt_csSup_iff] at h
-    obtain ⟨n', ⟨s', s'prop⟩, nltn'⟩ := h
-    · simp [isNClique_iff] at s'prop
-      rw [← s'prop.right] at nltn'
-      obtain ⟨t, tprop⟩ := Finset.exists_subset_card_eq (le_of_lt nltn')
-      use t
-      simp [← tprop.right, isNClique_iff]
-      have _ := @IsClique.subset V G s' t tprop.left s'prop.left
-      assumption
-    · use Fintype.card V
-      rintro y ⟨s, syc⟩
-      rw [isNClique_iff] at syc
-      rw [← syc.right]
-      exact Finset.card_le_card (Finset.subset_univ s)
-    · exact h'
+-- lemma exists_IsNClique_of_lt_cliqueNum  {n : ℕ} (h : n < G.cliqueNum) : {n | ∃ s, G.IsNClique n s}.Nonempty → ∃ S : Finset V, G.IsNClique n S := by
+--     intro h'
+--     simp [cliqueNum] at h
+--     rw [lt_csSup_iff] at h
+--     obtain ⟨n', ⟨s', s'prop⟩, nltn'⟩ := h
+--     · simp [isNClique_iff] at s'prop
+--       rw [← s'prop.right] at nltn'
+--       obtain ⟨t, tprop⟩ := Finset.exists_subset_card_eq (le_of_lt nltn')
+--       use t
+--       simp [← tprop.right, isNClique_iff]
+--       have _ := @IsClique.subset V G s' t tprop.left s'prop.left
+--       assumption
+--     · use Fintype.card V
+--       rintro y ⟨s, syc⟩
+--       rw [isNClique_iff] at syc
+--       rw [← syc.right]
+--       exact Finset.card_le_card (Finset.subset_univ s)
+--     · exact h'
 
-lemma fintype_cliqueNum_bddAbove : BddAbove {n | ∃ s, G.IsNClique n s} := by
-  use Fintype.card V
-  rintro y ⟨s, syc⟩
-  rw [isNClique_iff] at syc
-  rw [← syc.right]
-  exact Finset.card_le_card (Finset.subset_univ s)
+-- NOTE: (Much) Stronger version of the above
+lemma exists_IsNClique_of_le_cliqueNum  {n : ℕ} (h : n ≤ G.cliqueNum) : ∃ S : Finset V, G.IsNClique n S := by
+  rcases G.exists_isNClique_cliqueNum with ⟨s, sclique⟩
+  have nlescard : n ≤ s.card := by simp [h, sclique.card_eq]
+  obtain ⟨t, tprop⟩ := s.exists_subset_card_eq nlescard
+  use t
+  simp [← tprop.right, isNClique_iff]
+  exact sclique.isClique.subset tprop.left
 
 lemma cliqueNum2CliqueFree: G.cliqueNum < x ↔ G.CliqueFree x := by
   simp [CliqueFree, isNClique_iff]
   apply Iff.intro
   · intros H_cliqueNum S SIsClique
-    have tmp : S.card ≤ G.cliqueNum := @IsClique.card_le_cliqueNum  _ G _ S SIsClique
-    by_contra
-    linarith
+    linarith [SIsClique.card_le_cliqueNum]
   · intro NotXClique
     obtain ⟨S, SMaxClique⟩ := G.maximumClique_exists
     have SCardEqCN := maximumClique_card_eq_cliqueNum S SMaxClique
@@ -78,19 +66,13 @@ lemma cliqueNum2CliqueFree: G.cliqueNum < x ↔ G.CliqueFree x := by
     have SCardNEx := NotXClique S SMaxClique.left
     rw [SCardEqCN] at SCardNEx
     rcases Nat.lt_or_gt_of_ne (Ne.symm SCardNEx) with h | h
---TODO: modularize nonempty as lemma
-    · have nonempty : {n | ∃ s, G.IsNClique n s}.Nonempty := by
-        unfold Set.Nonempty
-        use S.card; use S
-        simp[isNClique_iff]
-        exact SMaxClique.left
-      obtain ⟨T, TClique⟩ := exists_IsNClique_of_lt_cliqueNum h nonempty
+    · obtain ⟨T, TClique⟩ := exists_IsNClique_of_le_cliqueNum G (Nat.le_of_lt h)
       simp [G.isNClique_iff] at TClique
       have contra := NotXClique T TClique.left
       simp_all
     · assumption
 
-theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [DecidableRel G.Adj], ¬ G.isXYGraph x y) ↔ RamseyGraphProp N x y := by
+theorem noXYGraphIffRamseyGraphProp (N: ℕ) : (∀ (G : SimpleGraph (Fin N)), ¬ G.isXYGraph x y) ↔ RamseyGraphProp N x y := by
   simp [isXYGraph, RamseyGraphProp, indNum]
   apply Iff.intro <;> intros H G
   · have cliqueNumProp := H G
@@ -108,6 +90,64 @@ theorem noXYGraphIffRamseyGraphProp (N: ℕ): (∀(G : SimpleGraph (Fin N)) [Dec
     · by_contra H
       simp [cliqueNum2CliqueFree] at H
       simp_all [CliqueFree]
+
+-- NOTE: This can be strengthened to <, using more or less the same proof
+lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
+  cases (Nat.eq_zero_or_pos (Fintype.card V)) with
+  | inl Vempty => simp [Vempty]
+  | inr Vnonempty =>
+    intro Gxy
+    simp [RamseyOld]
+    apply le_csSup
+    · simp [BddAbove, upperBounds, Set.Nonempty]
+      rcases (Ramsey₂Finite x y) with ⟨N, NRamsey⟩
+      simp at NRamsey
+      use N
+      intros M G Gxy
+      cases Nat.le_or_ge M N with
+      | inl _ => assumption
+      | inr MgeN =>
+        have MRamsey : RamseyGraphProp M x y := by
+          suffices Ramsey₂Prop M x y by rwa [← Ramsey₂GraphProp]
+          exact Ramsey.RamseyMonotone NRamsey MgeN
+        rw [← noXYGraphIffRamseyGraphProp] at MRamsey
+        cases MRamsey G Gxy
+    · simp [SimpleGraph.isXYGraph] at Gxy ⊢
+      have mapping : Fintype.card V = Fintype.card (Fin (Fintype.card V)) := by simp
+      rw [Fintype.card_eq] at mapping
+      rcases mapping with ⟨f, g, fginv, gfinv⟩
+      use G.map ⟨f, Function.LeftInverse.injective fginv⟩
+      apply And.intro <;> apply Nat.lt_of_not_ge <;> intro clique
+      · simp at clique
+        rcases exists_IsNClique_of_le_cliqueNum _ clique with ⟨s, sclique⟩
+        rw [SimpleGraph.isNClique_map_iff] at sclique
+        · rcases sclique with ⟨t, tclique, _⟩
+          have xle := tclique.isClique.card_le_cliqueNum
+          rw [tclique.card_eq] at xle
+          cases (Nat.not_lt_of_le xle) Gxy.left
+        · cases Nat.eq_zero_or_pos G.cliqueNum with
+          | inl cnzero =>
+            simp [Fintype.card_pos_iff] at Vnonempty
+            rcases Vnonempty with ⟨v⟩
+            have cliqueNum1 : 1 ≤ G.cliqueNum := by
+              suffices Finset.card {v} ≤ G.cliqueNum by simpa
+              apply SimpleGraph.IsClique.card_le_cliqueNum
+              simp [SimpleGraph.IsNClique]
+            simp [cnzero] at cliqueNum1
+          | inr cnpos =>
+            simp at cnpos
+            exact Nat.lt_of_le_of_lt cnpos Gxy.left
+      · sorry
+
+------------------------------------------------ RamseyOld <-> GraphRamsey
+variable {G}
+
+lemma fintype_cliqueNum_bddAbove : BddAbove {n | ∃ s, G.IsNClique n s} := by
+  use Fintype.card V
+  rintro y ⟨s, syc⟩
+  rw [isNClique_iff] at syc
+  rw [← syc.right]
+  exact Finset.card_le_card (Finset.subset_univ s)
 
 --TODO: prove mono_RamseyOld
 theorem GraphRamsey2RamseyOld : GraphRamsey x y = RamseyOld x y + 1 := by
