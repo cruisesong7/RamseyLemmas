@@ -26,26 +26,6 @@ theorem Lemma₁ : G.isXYGraph x y ↔ Gᶜ.isXYGraph y x := by
 
 variable [Fintype V]
 
--- lemma exists_IsNClique_of_lt_cliqueNum  {n : ℕ} (h : n < G.cliqueNum) : {n | ∃ s, G.IsNClique n s}.Nonempty → ∃ S : Finset V, G.IsNClique n S := by
---     intro h'
---     simp [cliqueNum] at h
---     rw [lt_csSup_iff] at h
---     obtain ⟨n', ⟨s', s'prop⟩, nltn'⟩ := h
---     · simp [isNClique_iff] at s'prop
---       rw [← s'prop.right] at nltn'
---       obtain ⟨t, tprop⟩ := Finset.exists_subset_card_eq (le_of_lt nltn')
---       use t
---       simp [← tprop.right, isNClique_iff]
---       have _ := @IsClique.subset V G s' t tprop.left s'prop.left
---       assumption
---     · use Fintype.card V
---       rintro y ⟨s, syc⟩
---       rw [isNClique_iff] at syc
---       rw [← syc.right]
---       exact Finset.card_le_card (Finset.subset_univ s)
---     · exact h'
-
--- NOTE: (Much) Stronger version of the above
 lemma exists_IsNClique_of_le_cliqueNum  {n : ℕ} (h : n ≤ G.cliqueNum) : ∃ S : Finset V, G.IsNClique n S := by
   rcases G.exists_isNClique_cliqueNum with ⟨s, sclique⟩
   have nlescard : n ≤ s.card := by simp [h, sclique.card_eq]
@@ -127,7 +107,8 @@ lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ R
       have mapping : Fintype.card V = Fintype.card (Fin (Fintype.card V)) := by simp
       rw [Fintype.card_eq] at mapping
       rcases mapping with ⟨f, g, fginv, gfinv⟩
-      use G.map ⟨f, Function.LeftInverse.injective fginv⟩
+      have fInj : f.Injective := Function.LeftInverse.injective fginv
+      use G.map ⟨f, fInj⟩
       apply And.intro <;> apply Nat.lt_of_not_ge <;> intro clique
       · simp at clique
         rcases exists_IsNClique_of_le_cliqueNum _ clique with ⟨s, sclique⟩
@@ -151,9 +132,6 @@ lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ R
       · simp at clique
         rcases exists_IsNClique_of_le_cliqueNum _ clique with ⟨s, sclique⟩
         replace Vnonempty := Fintype.card_pos_iff.mp Vnonempty
-        have fInj : f.Injective := by
-          apply Function.injective_iff_hasLeftInverse.mpr
-          use g
         have moveComplInside : (SimpleGraph.map { toFun := f, inj' := fInj} G)ᶜ = SimpleGraph.map { toFun := f, inj' := fInj} Gᶜ := by
           simp [SimpleGraph.map]
           ext v w
