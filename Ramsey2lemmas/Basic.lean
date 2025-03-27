@@ -420,6 +420,56 @@ lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G
     left
     assumption
 
+lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.s_i x y i ) := by
+  transitivity Fintype.card (Fin N.succ)
+  simp
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.s_i x y j > 0) , G.s_i x y j)
+  rw [@num_of_vertices_eq_sum_over_degrees (Fin N.succ) G]
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intro a
+    apply And.intro
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, v_i]
+    use a
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ a₂ h
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, v_i] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [v_i]
+    intros a
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[s_i, v_i]
+    suffices : Finset.univ.filter (fun v => G.degree v = G.degree a) = Finset.univ.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw [tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.s_i x y j > 0) (λ j ↦ (G.s_i x y j))]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    simp[s_i]
+    replace h := Finset.card_eq_zero.mpr h
+    exact h.symm
+
 lemma H1_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : ↑(G.neighborSet p), G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.t_i x y j p * v_i x y j := by
   suffices : ∑ v : ↑(G.neighborSet p), G.degree v = ∑ d in Finset.image (λ v => G.degree v) (G.neighborFinset p), d * ((G.neighborFinset p).filter (λ v => G.degree v = d)).card
   rw[this]
@@ -475,25 +525,72 @@ lemma H1_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : ↑(G.neighb
     intros a ha h
     left
     assumption
-  sorry
 
-lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.s_i x y i ) := by
-  transitivity Fintype.card (Fin N.succ)
-  simp
-  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.s_i x y j > 0) , G.s_i x y j)
-  rw [@num_of_vertices_eq_sum_over_degrees (Fin N.succ) G]
+  have h_sigma : (∑ v: (G.neighborSet p), G.degree v) =
+  ∑ p in Finset.sigma ((G.neighborFinset p).image (λ v => G.degree v)) (λ d => (G.neighborFinset p).filter (λ v =>  G.degree v = d)), G.degree p.2 := by
+    apply Finset.sum_bij (λ v hv => ⟨G.degree v, v⟩) <;> simp
+    intros a ha
+    refine ⟨?_, ha⟩
+    use a
+    intros p _ _ _ _ _
+    use p.2
+    simp_all
+
+  rw [h_sigma]
+
+  have h_inner_sum : ∀ d ∈ ((G.neighborFinset p).image (λ v => G.degree v)),
+  (∑ v in ((G.neighborFinset p).filter (λ v => G.degree v = d)), G.degree v) =
+  d * ((G.neighborFinset p).filter (λ v => G.degree v = d)).card := by
+    intros d hd
+    have h : ∀ v ∈ ((G.neighborFinset p).filter (λ v => G.degree v = d)), G.degree v = d := by
+      intros v hv
+      rw [Finset.mem_filter] at hv
+      rcases hv with ⟨hv1, hv2⟩
+      rw [hv2]
+    rw [Finset.sum_const_nat h]
+    apply mul_comm
+
+  suffices:
+    (∑ p in Finset.sigma  ((G.neighborFinset p).image (λ v => G.degree v)) (λ d => (G.neighborFinset p).filter (λ v => G.degree v = d)), G.degree p.2) =
+    (∑ d in ((G.neighborFinset p).image (λ v => G.degree v)), ∑ v in (G.neighborFinset p).filter (λ v =>  G.degree v = d), G.degree v)
+  rw[this]
+  apply Finset.sum_congr rfl h_inner_sum
+  simp [Finset.sum_sigma']
+
+lemma H1_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : ↑(Fintype.card ↑(G.neighborSet p)) = (∑ i ∈ Finset.range (σ_G hxy + 1), G.t_i x y i p) := by
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.t_i x y j p > 0) , G.t_i x y j p)
+  transitivity (∑ d ∈ (G.neighborFinset p).image (fun v => G.degree v), ((G.neighborFinset p).filter (fun v => G.degree v = d)).card)
+  · transitivity (∑ v : (G.neighborSet p), 1)
+    simp
+    have h_sigma : (∑ v: (G.neighborSet p), 1) =
+      ∑ p in Finset.sigma ((G.neighborFinset p).image (λ v => G.degree v)) (λ d => (G.neighborFinset p).filter (λ v =>  G.degree v = d)), 1 := by
+        apply Finset.sum_bij (λ v hv => ⟨G.degree v, v⟩) <;> simp
+        intros a ha
+        refine ⟨?_, ha⟩
+        use a
+        intros p _ _ _ _ _
+        use p.2
+        simp_all
+    rw [h_sigma]
+    suffices:
+        (∑ p in Finset.sigma ((G.neighborFinset p).image (λ v => G.degree v)) (λ d => (G.neighborFinset p).filter (λ v => G.degree v = d)), 1) =
+        (∑ d in ((G.neighborFinset p).image (λ v => G.degree v)), ∑ v in (G.neighborFinset p).filter (λ v =>  G.degree v = d), 1)
+    rw[this]
+    apply Finset.sum_congr rfl (by simp)
+    simp [Finset.sum_sigma']
   apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
   · simp[σ_G]
-    intro a
+    intro a ha
     apply And.intro
     have _ := G.minDegree_le_degree a
     omega
     simp [Finset.Nonempty, v_i]
     use a
+    refine ⟨ha, ?_⟩
     rw [Nat.cast_sub (Lemma₂ G a hxy).left]
     linarith
   · simp
-    intros a₁ a₂ h
+    intros a₁ _ a₂ _
     have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
     have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
     omega
@@ -504,28 +601,28 @@ lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Fin
     obtain ⟨a, ha⟩ := h
     use a
     zify
+    refine ⟨ha.left, ?_⟩
     rw [Nat.cast_sub (Lemma₂ G a hxy).left]
     linarith
   · simp [v_i]
-    intros a
+    intros a ha
     have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
       rw [Nat.sub_sub_self]
       exact (Lemma₂ G a hxy).left
     zify at tmp
     rw [Nat.cast_sub (by simp)] at tmp
-    simp[s_i, v_i]
-    suffices : Finset.univ.filter (fun v => G.degree v = G.degree a) = Finset.univ.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    simp[t_i, v_i]
+    suffices : ((G.neighborFinset p).filter (fun v => G.degree v = G.degree a)) = (G.neighborFinset p).filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
     rw[this]
     apply Finset.filter_congr
-    rw [tmp]
+    rw[tmp]
     norm_cast
     tauto
-  · rw [Finset.sum_filter (λ j ↦ G.s_i x y j > 0) (λ j ↦ (G.s_i x y j))]
+  · rw [Finset.sum_filter (λ j ↦ G.t_i x y j p > 0) (λ j ↦ G.t_i x y j p)]
+    simp[t_i, v_i]
     apply Finset.sum_bij (λ j _ ↦ j) <;> simp
     intros a ha h
-    simp[s_i]
-    replace h := Finset.card_eq_zero.mpr h
-    exact h.symm
+    simp[h]
 
 
 variable {G}
@@ -606,9 +703,9 @@ RamseyOld x y.succ * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i) + ∑ 
   rw [Finset.sum_sub_distrib] at part₂
   rw [← Finset.sum_mul] at part₂
   have tmp₂ : (∑ i ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.t_i x y i p): ℤ) = 2 * v_i x y i := by
-    sorry
-
-
+    rw[← hp, ← SimpleGraph.card_neighborSet_eq_degree]
+    rw [H1_vertCount_eq G p hxy]
+    simp [Finset.mul_sum]
   rw [tmp₂] at part₂
 
   rw [part₁, part₂] at count₂
