@@ -3,6 +3,7 @@ import Lean.Parser.Tactic
 import Mathlib.Tactic
 import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
+import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Nat.Lattice
 
 import FormalRamsey.Ramsey2Color
@@ -407,8 +408,7 @@ lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G
     exact aeq0
     left
     simp[s_i, v_i]
-    suffices : (Finset.filter (fun v => G.degree v = G.degree a) Finset.univ) = (Finset.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
-      Finset.univ)
+    suffices : (Finset.univ.filter (fun v => G.degree v = G.degree a)) = Finset.univ.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
     rw[this]
     apply Finset.filter_congr
     rw[tmp]
@@ -419,6 +419,63 @@ lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G
     intros a ha h
     left
     assumption
+
+lemma H1_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : ↑(G.neighborSet p), G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.t_i x y j p * v_i x y j := by
+  suffices : ∑ v : ↑(G.neighborSet p), G.degree v = ∑ d in Finset.image (λ v => G.degree v) (G.neighborFinset p), d * ((G.neighborFinset p).filter (λ v => G.degree v = d)).card
+  rw[this]
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.t_i x y j p > 0) , G.t_i x y j p * v_i x y j)
+  push_cast
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intros a ha
+    apply And.intro
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, v_i]
+    use a
+    refine ⟨ha, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ _ a₂ _
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, v_i] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    refine ⟨ha.left, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [v_i]
+    intros a ha
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[tmp, mul_comm]
+    by_cases aeq0 : G.degree a = 0
+    right
+    exact aeq0
+    left
+    simp[t_i, v_i]
+    suffices : ((G.neighborFinset p).filter (fun v => G.degree v = G.degree a)) = (G.neighborFinset p).filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw[tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.t_i x y j p > 0) (λ j ↦ ↑(G.t_i x y j p) * v_i x y j)]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    left
+    assumption
+  sorry
 
 lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.s_i x y i ) := by
   transitivity Fintype.card (Fin N.succ)
@@ -457,8 +514,7 @@ lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Fin
     zify at tmp
     rw [Nat.cast_sub (by simp)] at tmp
     simp[s_i, v_i]
-    suffices : (Finset.filter (fun v => G.degree v = G.degree a) Finset.univ) = (Finset.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
-      Finset.univ)
+    suffices : Finset.univ.filter (fun v => G.degree v = G.degree a) = Finset.univ.filter (fun v => (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
     rw[this]
     apply Finset.filter_congr
     rw [tmp]
@@ -508,6 +564,8 @@ RamseyOld x y.succ * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i) + ∑ 
   let rhs := ∑ j in Finset.range (σ_G hxy).succ, (s_i G x y j) * (v_i x y j)
 
   have count₁ : 2 * e = 2 * (lhs - e₁ G p + e₂ G p) := by
+    unfold lhs
+    rw[← H1_degreeCount_eq]
     sorry
 
   have count₂ : 2 * e = rhs := by
