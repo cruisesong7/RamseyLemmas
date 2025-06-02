@@ -3,6 +3,8 @@ import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Nat.Lattice
 
+import Ramsey2lemmas.Sym2
+
 import FormalRamsey.Ramsey2Color
 
 namespace SimpleGraph
@@ -501,106 +503,273 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
 
 variable (x y i)
 
-theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = vᵢ x y i) : 2 * ((↑(e₂ G p)  - ↑(e₁ G p))) =
-RamseyOld x y.succ * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i) + ∑ j in Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑(tᵢ G x y j p) - ↑(sᵢ G x y j)) := by
-  let e := G.edgeFinset.card
-  let lhs := ∑ j in Finset.range (σ_G hxy).succ, (tᵢ G x y j p) * (vᵢ x y j)
-  let rhs := ∑ j in Finset.range (σ_G hxy).succ, (sᵢ G x y j) * (vᵢ x y j)
+open Finset
 
-  have count₁ : 2 * e = 2 * (lhs - e₁ G p + e₂ G p) := by
-    unfold lhs
-    rw [← H₁_degreeCount_eq]
-    sorry
+lemma pairs_to_degree : ∀ u, #(Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ)) = G.degree u := by
+  intros u
+  unfold SimpleGraph.degree
+  apply Finset.card_nbij (λ e ↦ e.2)
+  · simp
+  · simp [Set.InjOn]
+  -- NOTE: You would think all of this follows from simps but most any simp here causes maxHeartbeats errors
+  · simp [Set.SurjOn]
+    rw [Set.subset_def]
+    intros v vadj
+    simp at vadj
+    rw [Set.mem_image]
+    use (u, v)
+    rw [Set.mem_image]
+    apply And.intro
+    · use v
+      simpa
+    · trivial
 
-  have count₂ : 2 * e = rhs := by
-    norm_cast
-    simp only[e, ← sum_degrees_eq_twice_card_edges]
-    apply G_degreeCount_eq
-
-  rw [count₁] at count₂
-
-  have count₂ : 2 * (G.e₂ p - G.e₁ p) = ↑rhs - 2 * (↑lhs : ℤ) := by
-    have tmp : G.e₁ p ≤ lhs := by sorry
-    omega
-  conv at count₂ =>
-    rhs
-    unfold lhs rhs
-    simp[vᵢ]
-
-  --hard to work with under conv, easier to show bijective
-  have part₁ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.sᵢ x y x_1) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
-  =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (↑(G.sᵢ x y x_1) * (↑(RamseyOld x (y + 1)): ℤ) - ↑(G.sᵢ x y x_1) * x_1) := by
-    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
-    intros a ha
-    linarith
-
-  rw[Finset.sum_sub_distrib] at part₁
-  rw [← Finset.sum_mul] at part₁
-  have tmp₁ : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.sᵢ x y i ) := G_vertCount_eq G hxy
-  zify at tmp₁
-  rw [tmp₁.symm] at part₁
-
-  have part₂ : 2 * ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.tᵢ x y x_1 p) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
-  =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.tᵢ x y x_1 p) * (↑(RamseyOld x (y + 1)): ℤ) - 2 * ↑(G.tᵢ x y x_1 p) * x_1) := by
-    rw[Finset.mul_sum]
-    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
-    intros a ha
-    linarith
-
-  rw [Finset.sum_sub_distrib] at part₂
-  rw [← Finset.sum_mul] at part₂
-  have tmp₂ : (∑ i ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.tᵢ x y i p): ℤ) = 2 * vᵢ x y i := by
-    sorry
-
-  rw [tmp₂] at part₂
-
-  rw [part₁, part₂] at count₂
-  rw [count₂]
-  rw [sub_sub_sub_comm]
-  rw [sub_sub_eq_add_sub, add_sub_assoc]
-  rw [← Finset.sum_sub_distrib]
-
-  have part₁ : ↑N.succ * ↑(RamseyOld x (y + 1)) - (2 * ↑(vᵢ x y i)) * ↑(RamseyOld x (y + 1)) =  ↑(RamseyOld x y.succ) * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i : ℤ) := by
-    rw [vᵢ]
-    rw [← mul_sub_right_distrib]
-    linarith
-
-  have part₂ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.tᵢ x y x_1 p) * ↑x_1 - ↑(G.sᵢ x y x_1) * ↑x_1 : ℤ) = ∑ j ∈ Finset.range (σ_G hxy).succ, ↑j * (2 * ↑(G.tᵢ x y j p) - ↑(G.sᵢ x y j): ℤ) := by
-    apply Finset.sum_bij (λ a ha ↦ a) <;> simp
-    intros a ha
-    linarith
-
-  rw [part₂]
-  simp at part₁
-  rw [part₁]
-  simp
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = vᵢ x y i) : 2 * (((e₂ G p : ℤ)  - e₁ G p)) =
+RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 * (tᵢ G x y j p) - (sᵢ G x y j : ℤ)) := by
+  suffices step1 : Fintype.card (↑G.edgeSet ⊕ ↑(G.induce (G.neighborSet p)).edgeSet) = Fintype.card ({ e : Fin N.succ × Fin N.succ | G.Adj e.fst e.snd ∧ e.fst ∈ G.neighborSet p } ⊕ ↑(G.induce (Gᶜ.neighborSet p)).edgeSet) by
+    have step2 : ∀ e, e ∈ (Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) ↔ e ∈ { e | G.Adj e.fst e.snd ∧ e.fst ∈ G.neighborSet p } := by
+      intro e
+      simp
+      apply Iff.intro
+      · intro ⟨u, ⟨uadj, ⟨v, ⟨vadj, euv⟩⟩⟩⟩
+        simp [← euv]
+        tauto
+      · intro
+        use e.1
+        apply And.intro
+        · tauto
+        · use e.2
+          tauto
+    have step3 : #(Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) = Finset.sum (G.neighborFinset p) (G.degree ·) := by
+      suffices #(Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) = Finset.sum (G.neighborFinset p) (λ u ↦ #(Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) by
+        trans Finset.sum (G.neighborFinset p) (λ u ↦ (Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ)).card)
+        · assumption
+        · apply Finset.sum_congr
+          · trivial
+          · intros u _
+            apply pairs_to_degree
+      apply Finset.card_biUnion
+      intros u uadj v vadj uneqv
+      intros x xinl xinr
+      simp [Finset.subset_iff] at xinl xinr ⊢
+      intros u' v' uvinx'
+      simp [Eq.trans (xinl u' v' uvinx').right (xinr u' v' uvinx').right.symm] at uneqv
+    simp only [Fintype.card_sum, Fintype.card_of_finset' _ step2, step3, H₁_degreeCount_eq G p hxy] at step1
+  apply @Fintype.card_of_bijective _ _ _ _ (λ e ↦ match e with | Sum.inl e' => (match Sym2.decBex (λ v ↦ G.Adj p v) ↑e' with | isTrue padj => Sum.inl ⟨if G.Adj p e'.val.toOrderedPair.fst then e'.val.toOrderedPair else e'.val.toOrderedPair.swap,  by have eedge := e'.prop; rw [e'.val.toOrderedPair_repr] at eedge padj; rw [G.mem_edgeSet] at eedge; split; simp [eedge]; assumption; simp [G.adj_symm eedge]; rw [Sym2.exists_mem_pair] at padj; simp_all⟩ | isFalse pnotadj => Sum.inr ⟨e'.val.pmap (λ v (vine' : v ∈ e'.val) ↦ ⟨v, by simp; rw [← not_or]; intro pcases; cases pcases with | inl peqv => have e'repr := Sym2.other_spec vine'; have padj := (↑e' : G.edgeSet).prop; rw [← e'repr, G.mem_edgeSet] at padj; simp [peqv] at pnotadj; apply pnotadj (Sym2.Mem.other vine') (Sym2.other_mem vine'); assumption | inr padj => have e'prop := e'.prop; apply pnotadj; use v⟩) (by simp), by cases e' with | mk e' e'edge => cases e' with | h u v => simp [Sym2.pmap, Quot.recOn, Quot.rec]; simp at e'edge; assumption⟩) | Sum.inr e' => Sum.inl ⟨(e'.val.map (·.val)).toOrderedPair.swap, by cases e' with | mk e' e'prop => cases e' with | h u v => have uvcases := @Sym2.toOrderedPair_repr (Fin N.succ) _ s(↑u, ↑v); simp at uvcases; cases uvcases with | inl uv => simp [← uv] at e'prop ⊢; rw [G.adj_comm]; have pv := v.prop; rw [G.mem_neighborSet] at pv; tauto | inr vu => simp [← vu] at e'prop ⊢; have pu := u.prop; rw [G.mem_neighborSet] at pu; tauto⟩)
+  apply And.intro
+  · intros a b fabeq
+    simp at fabeq
+    split at fabeq
+    next e' =>
+      split at fabeq
+      · split at fabeq
+        · split at fabeq
+          · congr
+            split at fabeq
+            · simp at fabeq
+              split at fabeq
+              · exact Subtype.val_inj.mp (Sym2.toOrderedPair_inj fabeq)
+              · cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).left
+            · simp at fabeq
+          · simp at fabeq
+            cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).left
+        · split at fabeq
+          next =>
+            split at fabeq
+            · simp at fabeq
+              split at fabeq
+              · symm at fabeq
+                cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).right
+              · simp at fabeq
+                congr
+                exact Subtype.val_inj.mp (Sym2.toOrderedPair_inj fabeq)
+            · simp at fabeq
+          next e'' =>
+            simp at fabeq
+            have e''prop := e''.prop
+            rw [e''.val.toOrderedPair_repr, SimpleGraph.mem_edgeSet] at e''prop
+            have e''fst := e''.val.toOrderedPair.fst.prop
+            have e''snd := e''.val.toOrderedPair.snd.prop
+            rw [G.mem_neighborSet] at e''fst e''snd
+            have e'mapped := Sym2.toOrderedPair_inj fabeq
+            rw [e'.val.toOrderedPair_repr, e''.val.toOrderedPair_repr, Sym2.map_pair_eq, Sym2.eq_iff] at e'mapped
+            cases e'mapped with
+            | inl e'fst =>
+              rw [← e'fst.left] at e''fst
+              contradiction
+            | inr e'snd =>
+              rw [← e'snd.left] at e''snd
+              contradiction
+      · split at fabeq
+        · split at fabeq
+          · simp at fabeq
+          · simp at fabeq
+            congr
+            ext u
+            have matcher : ∀ {β γ : Type} {P : γ → Prop} {u : β} {v : β} {f : (b : γ) → P b → β} {e : Sym2 γ} {h}, s(u, v) = Sym2.pmap f e h → u ∈ Sym2.pmap f e h := by
+              intros β γ P u v f e h pmapeq
+              have repl := Sym2.mem_mk_left u v
+              rw [pmapeq] at repl
+              assumption
+            apply Iff.intro <;> intro uine' <;> simp (config := { singlePass := true }) [← Sym2.other_spec uine'] at fabeq
+            · conv at fabeq =>
+                lhs
+                simp [Sym2.pmap, Quot.recOn, Quot.rec]
+              have matched := matcher fabeq
+              simp at matched
+              assumption
+            · conv at fabeq =>
+                rhs
+                simp [Sym2.pmap, Quot.recOn, Quot.rec]
+              have matched := matcher fabeq.symm
+              simp at matched
+              assumption
+        · simp at fabeq
+    next e' =>
+      split at fabeq
+      next e'' =>
+        split at fabeq
+        · simp at fabeq
+          split at fabeq
+          · cases (G.not_isDiag_of_mem_edgeSet e''.prop) (Sym2.toOrderedPair_IsDiag_of_eq fabeq.symm).left
+          · simp at fabeq
+            have e'prop := e'.prop
+            rw [e'.val.toOrderedPair_repr, SimpleGraph.mem_edgeSet] at e'prop
+            have e'fst := e'.val.toOrderedPair.fst.prop
+            have e'snd := e'.val.toOrderedPair.snd.prop
+            rw [G.mem_neighborSet] at e'fst e'snd
+            have e''mapped := Sym2.toOrderedPair_inj fabeq
+            rw [e'.val.toOrderedPair_repr, e''.val.toOrderedPair_repr, Sym2.map_pair_eq, Sym2.eq_iff] at e''mapped
+            cases e''mapped with
+            | inl e''fst =>
+              rw [e''fst.left] at e'fst
+              contradiction
+            | inr e''snd =>
+              rw [e''snd.right] at e'snd
+              contradiction
+        · simp at fabeq
+      next =>
+        simp at fabeq
+        have mapeq := Sym2.toOrderedPair_inj fabeq
+        congr
+        ext u
+        have matcher : ∀ {β γ : Type} {u : β} {v : β} {f : (b : γ) → β} {e : Sym2 γ}, s(u, v) = e.map f → u ∈ Sym2.map f e := by
+          intros β γ u v f e mapeq
+          have repl := Sym2.mem_mk_left u v
+          rw [mapeq] at repl
+          assumption
+        apply Iff.intro <;> intro uine' <;> simp (config := { singlePass := true }) [← Sym2.other_spec uine'] at mapeq
+        · have matched := matcher mapeq
+          simp at matched
+          exact matched.right
+        · have matched := matcher mapeq.symm
+          simp at matched
+          exact matched.right
+  · intros e
+    cases e with
+    | inl e =>
+      if pAdjsnd : G.Adj p e.val.snd then
+        have pAdjfst := e.prop.right
+        simp at pAdjfst
+        cases Fin.instLinearOrder.decidableLE e.val.fst e.val.snd with
+        | isTrue eordered =>
+          use Sum.inl ⟨s(e.val.fst ⊓ e.val.snd, e.val.fst ⊔ e.val.snd), by rw [G.mem_edgeSet, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]; exact e.prop.left⟩
+          simp
+          split
+          next =>
+            congr
+            split
+            next =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]
+            next notadj =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair] at notadj
+              have pAdjfst := e.prop.right
+              simp at pAdjfst
+              contradiction
+          next _ _ pnotadj _ =>
+            simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair, not_or] at pnotadj
+            have pAdjfst := e.prop.right
+            simp at pAdjfst
+            cases pnotadj.left pAdjfst
+        | isFalse eswapped =>
+          use Sum.inr ⟨s(⟨e.val.fst, pAdjfst⟩, ⟨e.val.snd, pAdjsnd⟩), e.prop.left⟩
+          simp at eswapped
+          simp [← Subtype.val_inj, Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]
+      else
+        cases Fin.instLinearOrder.decidableLE e.val.fst e.val.snd with
+        | isTrue eordered =>
+          simp at eordered
+          use Sum.inl ⟨s(e.val.fst ⊓ e.val.snd, e.val.fst ⊔ e.val.snd), by rw [G.mem_edgeSet, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]; exact e.prop.left⟩
+          simp
+          split
+          next padj _ =>
+            congr
+            split
+            next =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]
+            next notadj =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec] at notadj
+              simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair] at notadj padj
+              simp [pAdjsnd, notadj] at padj
+          next _ _ pnotadj _ =>
+            simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair, not_or] at pnotadj
+            have pAdjfst := e.prop.right
+            simp at pAdjfst
+            cases pnotadj.left pAdjfst
+        | isFalse eswapped =>
+          simp at eswapped
+          use Sum.inl ⟨s(e.val.fst ⊔ e.val.snd, e.val.fst ⊓ e.val.snd), by rw [G.mem_edgeSet, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]; exact e.prop.left⟩
+          simp
+          split
+          next padj _ =>
+            congr
+            split
+            next absurd =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)] at absurd
+              contradiction
+            next notadj =>
+              simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]
+          next _ _ pnotadj _ =>
+            simp only [min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped), Sym2.exists_mem_pair, not_or] at pnotadj
+            have pAdjfst := e.prop.right
+            simp at pAdjfst
+            cases pnotadj.left pAdjfst
+    | inr e =>
+      use Sum.inl ⟨e.val.map (·.val), by cases uv : e.val with | h u v => have uvedge := e.prop; simp [uv] at uvedge; assumption⟩
+      simp
+      split
+      next padj _ =>
+        simp
+        cases uv : e.val with
+        | h u v =>
+          simp [uv] at padj
+          have uprop := u.prop
+          have vprop := v.prop
+          simp only [SimpleGraph.neighborSet, Set.mem_setOf, SimpleGraph.compl_adj] at uprop vprop
+          simp [uprop.right, vprop.right] at padj
+      next => aesop
 
 theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i) :
-  2 * e₂ G p = ↑y * ((↑N.succ) - 2 * ↑y + 2 * ↑i) + ∑ j in Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑ (tᵢ G 2 y j p) - ↑(sᵢ G 2 y j)) := by
+  2 * e₂ G p = y * (N.succ - 2 * y + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 *  (tᵢ G 2 y j p : ℤ) - (sᵢ G 2 y j)) := by
   have Prop₂ := Prop₂ 2 y p i hxy hp
   suffices tmp: G.e₁ p = 0 ∧ RamseyOld 2 y.succ = y by
     rw [tmp.left, tmp.right] at Prop₂
     simp_all
   apply And.intro
-  · simp [Finset.filter_eq_empty_iff]
-    by_contra H
-    simp at H
-    obtain ⟨⟨u, v⟩, uvProp⟩ := H
-    simp [isXYGraph] at hxy
-    suffices (G.H₁ p).cliqueNum < 2 by
-      simp [cliqueNum2CliqueFree, CliqueFree, isNClique_iff] at this
-      have contra := this {u,v}
-      simp [IsClique] at contra uvProp
-      simp [uvProp] at contra
-      rw [Finset.card_insert_of_not_mem] at contra
-      · trivial
-      · by_contra
-        simp_all
-
-    have H₁CliqueNum_UB := cliqueNumMono G p
-    simp[← Nat.sub_lt_sub_iff_right (oneLeCN G)] at hxy
-    linarith
-
+  · simp [e₁, H₁, Finset.filter_eq_empty_iff]
+    intros x uv
+    cases xeq : x with
+    | h u v =>
+      simp [xeq] at uv
+      have pu := u.prop
+      have pv := v.prop
+      rw [SimpleGraph.mem_neighborSet] at pu pv
+      simp [isXYGraph] at hxy
+      have clique3 := And.intro pu (And.intro pv uv)
+      rw [← G.is3Clique_triple_iff] at clique3
+      have cliqueNum3 := clique3.isClique.card_le_cliqueNum
+      simp [clique3.card_eq] at cliqueNum3
+      cases (Nat.lt_irrefl G.cliqueNum) (Nat.lt_of_lt_of_le hxy.left cliqueNum3)
   · have tmp := GraphRamsey2 y
     simp [GraphRamsey2RamseyOld] at tmp
     exact tmp
