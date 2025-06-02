@@ -1,6 +1,3 @@
-import Mathlib.Data.Rat.Init
-import Lean.Parser.Tactic
-import Mathlib.Tactic
 import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Combinatorics.SimpleGraph.Finite
