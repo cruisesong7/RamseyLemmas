@@ -2,7 +2,11 @@ import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Nat.Lattice
+<<<<<<< HEAD
 
+=======
+import Mathlib.Tactic
+>>>>>>> 9287074 (prop2 finished)
 import Ramsey2lemmas.Sym2
 
 import FormalRamsey.Ramsey2Color
@@ -173,7 +177,11 @@ theorem GraphRamsey2RamseyOld : GraphRamsey x y = RamseyOld x y + 1 := by
 
 variable (i : ℕ) (G) [DecidableRel G.Adj]
 
+<<<<<<< HEAD
 noncomputable abbrev vᵢ : ℕ := RamseyOld x y.succ - i
+=======
+noncomputable abbrev vᵢ : ℤ := RamseyOld x y.succ - i
+>>>>>>> 9287074 (prop2 finished)
 
 noncomputable abbrev sᵢ : ℕ := (Finset.univ).filter (λ v ↦ G.degree v = vᵢ x y i) |>.card
 
@@ -338,10 +346,15 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
 lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.sᵢ x y j * vᵢ x y j := by
   rw [sum_degree_eq_sum_over_degrees]
   transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.sᵢ x y j > 0) , G.sᵢ x y j * vᵢ x y j)
+<<<<<<< HEAD
+=======
+  push_cast
+>>>>>>> 9287074 (prop2 finished)
   apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
   · simp[σ_G]
     intro a
     apply And.intro
+<<<<<<< HEAD
     · apply Nat.sub_lt_left_of_lt_add (Lemma₂ G a hxy).left
       simp +arith [← Nat.add_assoc, ← Nat.add_sub_assoc (Nat.le_trans (G.minDegree_le_degree a) (Lemma₂ G a hxy).left)]
       apply Nat.le_sub_of_add_le
@@ -364,12 +377,54 @@ lemma G_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : Fin N.succ, G
   · simp [vᵢ]
     intros a
     simp [tsub_tsub_assoc (Nat.le_refl (RamseyOld x y.succ)) (Lemma₂ G a hxy).left, sᵢ, vᵢ, mul_comm]
+=======
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, vᵢ]
+    use a
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ a₂ h
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, vᵢ] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [vᵢ]
+    intros a
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[tmp, mul_comm]
+    by_cases aeq0 : G.degree a = 0
+    right
+    exact aeq0
+    left
+    simp[sᵢ, vᵢ]
+    suffices : (Finset.univ.filter (fun v ↦ G.degree v = G.degree a)) = Finset.univ.filter (fun v ↦ (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw[tmp]
+    norm_cast
+    tauto
+>>>>>>> 9287074 (prop2 finished)
   · rw [Finset.sum_filter (λ j ↦ G.sᵢ x y j > 0) (λ j ↦ ↑(G.sᵢ x y j) * vᵢ x y j)]
     apply Finset.sum_bij (λ j _ ↦ j) <;> simp
     intros a ha h
     left
     assumption
 
+<<<<<<< HEAD
 lemma H₁_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v ∈ G.neighborFinset p, G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.tᵢ x y j p * vᵢ x y j := by
   suffices ∑ v ∈ (G.neighborFinset p), G.degree v = ∑ d in Finset.image (λ v => G.degree v) (G.neighborFinset p), d * ((G.neighborFinset p).filter (λ v => G.degree v = d)).card by
     rw [this]
@@ -442,6 +497,210 @@ lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Fin
       intros a ha h
       simp [sᵢ, h]
 
+=======
+lemma G_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.sᵢ x y i ) := by
+  transitivity Fintype.card (Fin N.succ)
+  simp
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.sᵢ x y j > 0) , G.sᵢ x y j)
+  rw [@num_of_vertices_eq_sum_over_degrees (Fin N.succ) G]
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intro a
+    apply And.intro
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, vᵢ]
+    use a
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ a₂ h
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, vᵢ] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [vᵢ]
+    intros a
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[sᵢ, vᵢ]
+    suffices : Finset.univ.filter (fun v ↦ G.degree v = G.degree a) = Finset.univ.filter (fun v ↦ (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw [tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.sᵢ x y j > 0) (λ j ↦ (G.sᵢ x y j))]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    simp[sᵢ]
+    replace h := Finset.card_eq_zero.mpr h
+    exact h.symm
+
+lemma H₁_degreeCount_eq (hxy : G.isXYGraph x.succ y.succ) : ∑ v : (G.neighborFinset p), G.degree v = ∑ j ∈ Finset.range (σ_G hxy).succ, G.tᵢ x y j p * vᵢ x y j := by
+  suffices : ∑ v : (G.neighborFinset p), G.degree v = ∑ d in Finset.image (λ v ↦ G.degree v) (G.neighborFinset p), d * ((G.neighborFinset p).filter (λ v ↦ G.degree v = d)).card
+  rw[this]
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.tᵢ x y j p > 0) , G.tᵢ x y j p * vᵢ x y j)
+  push_cast
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intros a ha
+    apply And.intro
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, vᵢ]
+    use a
+    refine ⟨ha, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ _ a₂ _
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, vᵢ] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    refine ⟨ha.left, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [vᵢ]
+    intros a ha
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[tmp, mul_comm]
+    by_cases aeq0 : G.degree a = 0
+    right
+    exact aeq0
+    left
+    simp[tᵢ, vᵢ]
+    suffices : ((G.neighborFinset p).filter (fun v ↦ G.degree v = G.degree a)) = (G.neighborFinset p).filter (fun v ↦ (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw[tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.tᵢ x y j p > 0) (λ j ↦ ↑(G.tᵢ x y j p) * vᵢ x y j)]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    left
+    assumption
+
+  have h_sigma : (∑ v: (G.neighborFinset p), G.degree v) =
+  ∑ p in Finset.sigma ((G.neighborFinset p).image (λ v ↦ G.degree v)) (λ d ↦ (G.neighborFinset p).filter (λ v ↦  G.degree v = d)), G.degree p.2 := by
+    apply Finset.sum_bij (λ v hv ↦ ⟨G.degree v, v⟩) <;> simp
+    intros a ha
+    use a
+    intros p _ _ _ _ _
+    use p.2
+    simp_all
+
+  rw [h_sigma]
+
+  have h_inner_sum : ∀ d ∈ ((G.neighborFinset p).image (λ v ↦ G.degree v)),
+  (∑ v in ((G.neighborFinset p).filter (λ v ↦ G.degree v = d)), G.degree v) =
+  d * ((G.neighborFinset p).filter (λ v ↦ G.degree v = d)).card := by
+    intros d hd
+    have h : ∀ v ∈ ((G.neighborFinset p).filter (λ v ↦ G.degree v = d)), G.degree v = d := by
+      intros v hv
+      rw [Finset.mem_filter] at hv
+      rcases hv with ⟨hv1, hv2⟩
+      rw [hv2]
+    rw [Finset.sum_const_nat h]
+    apply mul_comm
+
+  suffices:
+    (∑ p in Finset.sigma  ((G.neighborFinset p).image (λ v ↦ G.degree v)) (λ d ↦ (G.neighborFinset p).filter (λ v ↦ G.degree v = d)), G.degree p.2) =
+    (∑ d in ((G.neighborFinset p).image (λ v ↦ G.degree v)), ∑ v in (G.neighborFinset p).filter (λ v ↦  G.degree v = d), G.degree v)
+  rw[this]
+  apply Finset.sum_congr rfl h_inner_sum
+  simp [Finset.sum_sigma']
+
+lemma H₁_vertCount_eq (hxy : G.isXYGraph x.succ y.succ) : ↑(Fintype.card ↑(G.neighborSet p)) = (∑ i ∈ Finset.range (σ_G hxy + 1), G.tᵢ x y i p) := by
+  transitivity (∑ j ∈ (Finset.range (σ_G hxy).succ).filter (λ j ↦ G.tᵢ x y j p > 0) , G.tᵢ x y j p)
+  transitivity (∑ d ∈ (G.neighborFinset p).image (fun v ↦ G.degree v), ((G.neighborFinset p).filter (fun v ↦ G.degree v = d)).card)
+  · transitivity (∑ v : (G.neighborSet p), 1)
+    simp
+    have h_sigma : (∑ v: (G.neighborSet p), 1) =
+      ∑ p in Finset.sigma ((G.neighborFinset p).image (λ v ↦ G.degree v)) (λ d ↦ (G.neighborFinset p).filter (λ v ↦  G.degree v = d)), 1 := by
+        apply Finset.sum_bij (λ v hv ↦ ⟨G.degree v, v⟩) <;> simp
+        intros a ha
+        refine ⟨?_, ha⟩
+        use a
+        intros p _ _ _ _ _
+        use p.2
+        simp_all
+    rw [h_sigma]
+    suffices:
+        (∑ p in Finset.sigma ((G.neighborFinset p).image (λ v ↦ G.degree v)) (λ d ↦ (G.neighborFinset p).filter (λ v ↦ G.degree v = d)), 1) =
+        (∑ d in ((G.neighborFinset p).image (λ v ↦ G.degree v)), ∑ v in (G.neighborFinset p).filter (λ v ↦  G.degree v = d), 1)
+    rw[this]
+    apply Finset.sum_congr rfl (by simp)
+    simp [Finset.sum_sigma']
+  apply Finset.sum_bij (λ d hd ↦ RamseyOld x y.succ - d)
+  · simp[σ_G]
+    intro a ha
+    apply And.intro
+    have _ := G.minDegree_le_degree a
+    omega
+    simp [Finset.Nonempty, vᵢ]
+    use a
+    refine ⟨ha, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp
+    intros a₁ _ a₂ _
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₁ := by linarith[(Lemma₂ G a₁ hxy).left]
+    have _ : RamseyOld x (y + 1) ≥ G.degree a₂ := by linarith[(Lemma₂ G a₂ hxy).left]
+    omega
+  · simp[σ_G]
+    intros b hb h
+    rw [Nat.lt_succ_iff] at hb
+    simp[Finset.Nonempty, vᵢ] at h
+    obtain ⟨a, ha⟩ := h
+    use a
+    zify
+    refine ⟨ha.left, ?_⟩
+    rw [Nat.cast_sub (Lemma₂ G a hxy).left]
+    linarith
+  · simp [vᵢ]
+    intros a ha
+    have tmp : RamseyOld x (y + 1) - (RamseyOld x (y + 1) - G.degree a) = G.degree a := by
+      rw [Nat.sub_sub_self]
+      exact (Lemma₂ G a hxy).left
+    zify at tmp
+    rw [Nat.cast_sub (by simp)] at tmp
+    simp[tᵢ, vᵢ]
+    suffices : ((G.neighborFinset p).filter (fun v ↦ G.degree v = G.degree a)) = (G.neighborFinset p).filter (fun v ↦ (↑(G.degree v): ℤ) = ↑(RamseyOld x (y + 1)) - ↑(RamseyOld x (y + 1) - G.degree a))
+    rw[this]
+    apply Finset.filter_congr
+    rw[tmp]
+    norm_cast
+    tauto
+  · rw [Finset.sum_filter (λ j ↦ G.tᵢ x y j p > 0) (λ j ↦ G.tᵢ x y j p)]
+    simp[tᵢ, vᵢ]
+    apply Finset.sum_bij (λ j _ ↦ j) <;> simp
+    intros a ha h
+    simp[h]
+>>>>>>> 9287074 (prop2 finished)
 variable {G}
 
 theorem Prop₁ (hxy : G.isXYGraph x.succ y.succ):
@@ -491,6 +750,7 @@ lemma pairs_to_degree : ∀ u, #(Finset.image (u, ·) (Finset.filter (G.Adj u ·
     · use v
       simpa
     · trivial
+<<<<<<< HEAD
 
 theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = vᵢ x y i) : 2 * (((e₂ G p : ℤ)  - e₁ G p)) =
 RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 * (tᵢ G x y j p) - (sᵢ G x y j : ℤ)) := by
@@ -716,6 +976,316 @@ RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j in Fins
           simp only [SimpleGraph.neighborSet, Set.mem_setOf, SimpleGraph.compl_adj] at uprop vprop
           simp [uprop.right, vprop.right] at padj
       next => aesop
+=======
+set_option maxHeartbeats 400000
+
+theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (hp: G.degree p = vᵢ x y i) : 2 * (((e₂ G p : ℤ)  - e₁ G p)) =
+RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 * (tᵢ G x y j p) - (sᵢ G x y j : ℤ)) := by
+  suffices step1 : Fintype.card (↑G.edgeSet ⊕ ↑(G.induce (G.neighborSet p)).edgeSet) = Fintype.card ({ e : Fin N.succ × Fin N.succ | G.Adj e.fst e.snd ∧ e.fst ∈ G.neighborSet p } ⊕ ↑(G.induce (Gᶜ.neighborSet p)).edgeSet)
+  have step2 : ∀ e, e ∈ (Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) ↔ e ∈ { e | G.Adj e.fst e.snd ∧ e.fst ∈ G.neighborSet p } := by
+    intro e
+    simp
+    apply Iff.intro
+    · intro ⟨u, ⟨uadj, ⟨v, ⟨vadj, euv⟩⟩⟩⟩
+      simp [← euv]
+      tauto
+    · intro
+      use e.1
+      apply And.intro
+      · tauto
+      · use e.2
+        tauto
+
+  have step3 : #(Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) = Finset.sum (G.neighborFinset p) (G.degree ·) := by
+    suffices #(Finset.biUnion (G.neighborFinset p) (λ u ↦ Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) = Finset.sum (G.neighborFinset p) (λ u ↦ #(Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ))) by
+      trans Finset.sum (G.neighborFinset p) (λ u ↦ (Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ)).card)
+      · assumption
+      · apply Finset.sum_congr
+        · trivial
+        · intros u _
+          apply pairs_to_degree
+    apply Finset.card_biUnion
+    intros u uadj v vadj uneqv
+    intros x xinl xinr
+    simp [Finset.subset_iff] at xinl xinr ⊢
+    intros u' v' uvinx'
+    simp [Eq.trans (xinl u' v' uvinx').right (xinr u' v' uvinx').right.symm] at uneqv
+
+  simp only [Fintype.card_sum, Fintype.card_of_finset' _ step2, step3, H₁_degreeCount_eq G p hxy] at step1
+
+  · let e := G.edgeFinset.card
+    let lhs := ∑ j in Finset.range (σ_G hxy).succ, (tᵢ  G x y j p) * (vᵢ x y j)
+    let rhs := ∑ j in Finset.range (σ_G hxy).succ, (sᵢ G x y j) * (vᵢ x y j)
+    have count₁ : 2 * e = 2 * (lhs - e₁ G p + e₂ G p) := by
+      have : lhs =  ∑ x ∈ G.neighborFinset p, G.degree x  := by
+        unfold lhs
+        simp [← H₁_degreeCount_eq]
+        norm_cast
+        rw[Finset.sum_attach (G.neighborFinset p) (λ x ↦ G.degree x)]
+
+      rw[this]
+      rw[show ↑(G.e₁ p) = Fintype.card ↑(induce (G.neighborSet p) G).edgeSet by simp [e₁, H₁]]
+      rw[show ↑(G.e₂ p) = Fintype.card ↑(induce (Gᶜ.neighborSet p) G).edgeSet by simp [e₂, H₂]]
+      rw[show e = Fintype.card ↑G.edgeSet by simp[e]]
+      omega
+    have count₂ : 2 * e = rhs := by
+      norm_cast
+      simp only[e, ← sum_degrees_eq_twice_card_edges]
+      apply G_degreeCount_eq
+
+    rw [count₁] at count₂
+
+    have count₂ : 2 * (G.e₂ p - G.e₁ p) = ↑rhs - 2 * (↑lhs : ℤ) := by
+      omega
+    conv at count₂ =>
+      rhs
+      unfold lhs rhs
+      simp[vᵢ]
+
+    have part₁ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.sᵢ x y x_1) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
+    =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (↑(G.sᵢ x y x_1) * (↑(RamseyOld x (y + 1)): ℤ) - ↑(G.sᵢ x y x_1) * x_1) := by
+      apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+      intros a ha
+      linarith
+
+    rw[Finset.sum_sub_distrib] at part₁
+    rw [← Finset.sum_mul] at part₁
+    have tmp₁ : N.succ = (∑ i ∈ Finset.range (σ_G hxy + 1), G.sᵢ x y i ) := G_vertCount_eq G hxy
+    zify at tmp₁
+    rw [tmp₁.symm] at part₁
+
+    have part₂ : 2 * ∑ x_1 ∈ Finset.range (σ_G hxy + 1), ↑(G.tᵢ x y x_1 p) * (↑(RamseyOld x (y + 1)) - ↑x_1 : ℤ)
+    =  ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.tᵢ x y x_1 p) * (↑(RamseyOld x (y + 1)): ℤ) - 2 * ↑(G.tᵢ x y x_1 p) * x_1) := by
+      rw[Finset.mul_sum]
+      apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+      intros a ha
+      linarith
+
+    rw [Finset.sum_sub_distrib] at part₂
+    rw [← Finset.sum_mul] at part₂
+    have tmp₂ : (∑ i ∈ Finset.range (σ_G hxy + 1), 2 * ↑(G.tᵢ x y i p): ℤ) = 2 * vᵢ x y i := by
+      rw[← hp, ← SimpleGraph.card_neighborSet_eq_degree]
+      rw [H₁_vertCount_eq G p hxy]
+      simp [Finset.mul_sum]
+    rw [tmp₂] at part₂
+
+    rw [part₁, part₂] at count₂
+    rw [count₂]
+    rw [sub_sub_sub_comm]
+    rw [sub_sub_eq_add_sub, add_sub_assoc]
+    rw [← Finset.sum_sub_distrib]
+
+    have part₁ : ↑N.succ * ↑(RamseyOld x (y + 1)) - (2 * ↑(vᵢ x y i)) * ↑(RamseyOld x (y + 1)) =  ↑(RamseyOld x y.succ) * (↑N.succ - 2 * ↑(RamseyOld x y.succ) + 2 * ↑i : ℤ) := by
+      rw [vᵢ]
+      rw [← mul_sub_right_distrib]
+      linarith
+
+    have part₂ : ∑ x_1 ∈ Finset.range (σ_G hxy + 1), (2 * ↑(G.tᵢ x y x_1 p) * ↑x_1 - ↑(G.sᵢ x y x_1) * ↑x_1 : ℤ) = ∑ j ∈ Finset.range (σ_G hxy).succ, ↑j * (2 * ↑(G.tᵢ x y j p) - ↑(G.sᵢ x y j): ℤ) := by
+      apply Finset.sum_bij (λ a ha ↦ a) <;> simp
+      intros a ha
+      linarith
+
+    rw [part₂]
+    simp at part₁
+    rw [part₁]
+    simp
+
+
+  · apply @Fintype.card_of_bijective _ _ _ _ (λ e ↦ match e with | Sum.inl e' => (match Sym2.decBex (λ v ↦ G.Adj p v) ↑e' with | isTrue padj => Sum.inl ⟨if G.Adj p e'.val.toOrderedPair.fst then e'.val.toOrderedPair else e'.val.toOrderedPair.swap,  by have eedge := e'.prop; rw [e'.val.toOrderedPair_repr] at eedge padj; rw [G.mem_edgeSet] at eedge; split; simp [eedge]; assumption; simp [G.adj_symm eedge]; rw [Sym2.exists_mem_pair] at padj; simp_all⟩ | isFalse pnotadj => Sum.inr ⟨e'.val.pmap (λ v (vine' : v ∈ e'.val) ↦ ⟨v, by simp; rw [← not_or]; intro pcases; cases pcases with | inl peqv => have e'repr := Sym2.other_spec vine'; have padj := (↑e' : G.edgeSet).prop; rw [← e'repr, G.mem_edgeSet] at padj; simp [peqv] at pnotadj; apply pnotadj (Sym2.Mem.other vine') (Sym2.other_mem vine'); assumption | inr padj => have e'prop := e'.prop; apply pnotadj; use v⟩) (by simp), by cases e' with | mk e' e'edge => cases e' with | h u v => simp [Sym2.pmap, Quot.recOn, Quot.rec]; simp at e'edge; assumption⟩) | Sum.inr e' => Sum.inl ⟨(e'.val.map (·.val)).toOrderedPair.swap, by cases e' with | mk e' e'prop => cases e' with | h u v => have uvcases := @Sym2.toOrderedPair_repr (Fin N.succ) _ s(↑u, ↑v); simp at uvcases; cases uvcases with | inl uv => simp [← uv] at e'prop ⊢; rw [G.adj_comm]; have pv := v.prop; rw [G.mem_neighborSet] at pv; tauto | inr vu => simp [← vu] at e'prop ⊢; have pu := u.prop; rw [G.mem_neighborSet] at pu; tauto⟩)
+    apply And.intro
+    · intros a b fabeq
+      simp at fabeq
+      split at fabeq
+      next e' =>
+        split at fabeq
+        · split at fabeq
+          · split at fabeq
+            · congr
+              split at fabeq
+              · simp at fabeq
+                split at fabeq
+                · exact Subtype.val_inj.mp (Sym2.toOrderedPair_inj fabeq)
+                · cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).left
+              · simp at fabeq
+            · simp at fabeq
+              cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).left
+          · split at fabeq
+            next =>
+              split at fabeq
+              · simp at fabeq
+                split at fabeq
+                · symm at fabeq
+                  cases G.not_isDiag_of_mem_edgeSet e'.prop (Sym2.toOrderedPair_IsDiag_of_eq fabeq).right
+                · simp at fabeq
+                  congr
+                  exact Subtype.val_inj.mp (Sym2.toOrderedPair_inj fabeq)
+              · simp at fabeq
+            next e'' =>
+              simp at fabeq
+              have e''prop := e''.prop
+              rw [e''.val.toOrderedPair_repr, SimpleGraph.mem_edgeSet] at e''prop
+              have e''fst := e''.val.toOrderedPair.fst.prop
+              have e''snd := e''.val.toOrderedPair.snd.prop
+              rw [G.mem_neighborSet] at e''fst e''snd
+              have e'mapped := Sym2.toOrderedPair_inj fabeq
+              rw [e'.val.toOrderedPair_repr, e''.val.toOrderedPair_repr, Sym2.map_pair_eq, Sym2.eq_iff] at e'mapped
+              cases e'mapped with
+              | inl e'fst =>
+                rw [← e'fst.left] at e''fst
+                contradiction
+              | inr e'snd =>
+                rw [← e'snd.left] at e''snd
+                contradiction
+        · split at fabeq
+          · split at fabeq
+            · simp at fabeq
+            · simp at fabeq
+              congr
+              ext u
+              have matcher : ∀ {β γ : Type} {P : γ → Prop} {u : β} {v : β} {f : (b : γ) → P b → β} {e : Sym2 γ} {h}, s(u, v) = Sym2.pmap f e h → u ∈ Sym2.pmap f e h := by
+                intros β γ P u v f e h pmapeq
+                have repl := Sym2.mem_mk_left u v
+                rw [pmapeq] at repl
+                assumption
+              apply Iff.intro <;> intro uine' <;> simp (config := { singlePass := true }) [← Sym2.other_spec uine'] at fabeq
+              · conv at fabeq =>
+                  lhs
+                  simp [Sym2.pmap, Quot.recOn, Quot.rec]
+                have matched := matcher fabeq
+                simp at matched
+                assumption
+              · conv at fabeq =>
+                  rhs
+                  simp [Sym2.pmap, Quot.recOn, Quot.rec]
+                have matched := matcher fabeq.symm
+                simp at matched
+                assumption
+          · simp at fabeq
+      next e' =>
+        split at fabeq
+        next e'' =>
+          split at fabeq
+          · simp at fabeq
+            split at fabeq
+            · cases (G.not_isDiag_of_mem_edgeSet e''.prop) (Sym2.toOrderedPair_IsDiag_of_eq fabeq.symm).left
+            · simp at fabeq
+              have e'prop := e'.prop
+              rw [e'.val.toOrderedPair_repr, SimpleGraph.mem_edgeSet] at e'prop
+              have e'fst := e'.val.toOrderedPair.fst.prop
+              have e'snd := e'.val.toOrderedPair.snd.prop
+              rw [G.mem_neighborSet] at e'fst e'snd
+              have e''mapped := Sym2.toOrderedPair_inj fabeq
+              rw [e'.val.toOrderedPair_repr, e''.val.toOrderedPair_repr, Sym2.map_pair_eq, Sym2.eq_iff] at e''mapped
+              cases e''mapped with
+              | inl e''fst =>
+                rw [e''fst.left] at e'fst
+                contradiction
+              | inr e''snd =>
+                rw [e''snd.right] at e'snd
+                contradiction
+          · simp at fabeq
+        next =>
+          simp at fabeq
+          have mapeq := Sym2.toOrderedPair_inj fabeq
+          congr
+          ext u
+          have matcher : ∀ {β γ : Type} {u : β} {v : β} {f : (b : γ) → β} {e : Sym2 γ}, s(u, v) = e.map f → u ∈ Sym2.map f e := by
+            intros β γ u v f e mapeq
+            have repl := Sym2.mem_mk_left u v
+            rw [mapeq] at repl
+            assumption
+          apply Iff.intro <;> intro uine' <;> simp (config := { singlePass := true }) [← Sym2.other_spec uine'] at mapeq
+          · have matched := matcher mapeq
+            simp at matched
+            exact matched.right
+          · have matched := matcher mapeq.symm
+            simp at matched
+            exact matched.right
+    · intros e
+      cases e with
+      | inl e =>
+        if pAdjsnd : G.Adj p e.val.snd then
+          have pAdjfst := e.prop.right
+          simp at pAdjfst
+          cases Fin.instLinearOrder.decidableLE e.val.fst e.val.snd with
+          | isTrue eordered =>
+            use Sum.inl ⟨s(e.val.fst ⊓ e.val.snd, e.val.fst ⊔ e.val.snd), by rw [G.mem_edgeSet, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]; exact e.prop.left⟩
+            simp
+            split
+            next =>
+              congr
+              split
+              next =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]
+              next notadj =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair] at notadj
+                have pAdjfst := e.prop.right
+                simp at pAdjfst
+                contradiction
+            next _ _ pnotadj _ =>
+              simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair, not_or] at pnotadj
+              have pAdjfst := e.prop.right
+              simp at pAdjfst
+              cases pnotadj.left pAdjfst
+          | isFalse eswapped =>
+            use Sum.inr ⟨s(⟨e.val.fst, pAdjfst⟩, ⟨e.val.snd, pAdjsnd⟩), e.prop.left⟩
+            simp at eswapped
+            simp [← Subtype.val_inj, Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]
+        else
+          cases Fin.instLinearOrder.decidableLE e.val.fst e.val.snd with
+          | isTrue eordered =>
+            simp at eordered
+            use Sum.inl ⟨s(e.val.fst ⊓ e.val.snd, e.val.fst ⊔ e.val.snd), by rw [G.mem_edgeSet, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]; exact e.prop.left⟩
+            simp
+            split
+            next padj _ =>
+              congr
+              split
+              next =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered]
+              next notadj =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec] at notadj
+                simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair] at notadj padj
+                simp [pAdjsnd, notadj] at padj
+            next _ _ pnotadj _ =>
+              simp only [min_eq_left_iff.mpr eordered, max_eq_right_iff.mpr eordered, Sym2.exists_mem_pair, not_or] at pnotadj
+              have pAdjfst := e.prop.right
+              simp at pAdjfst
+              cases pnotadj.left pAdjfst
+          | isFalse eswapped =>
+            simp at eswapped
+            use Sum.inl ⟨s(e.val.fst ⊔ e.val.snd, e.val.fst ⊓ e.val.snd), by rw [G.mem_edgeSet, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]; exact e.prop.left⟩
+            simp
+            split
+            next padj _ =>
+              congr
+              split
+              next absurd =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)] at absurd
+                contradiction
+              next notadj =>
+                simp [Sym2.toOrderedPair, Sym2.rec, Quot.recOn, Quot.rec, min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped)]
+            next _ _ pnotadj _ =>
+              simp only [min_eq_right_iff.mpr (Fin.le_of_lt eswapped), max_eq_left_iff.mpr (Fin.le_of_lt eswapped), Sym2.exists_mem_pair, not_or] at pnotadj
+              have pAdjfst := e.prop.right
+              simp at pAdjfst
+              tauto
+              -- cases pnotadj.left pAdjfst
+      | inr e =>
+        use Sum.inl ⟨e.val.map (·.val), by cases uv : e.val with | h u v => have uvedge := e.prop; simp [uv] at uvedge; assumption⟩
+        simp
+        split
+        next padj _ =>
+          simp
+          cases uv : e.val with
+          | h u v =>
+            simp [uv] at padj
+            have uprop := u.prop
+            have vprop := v.prop
+            simp only [SimpleGraph.neighborSet, Set.mem_setOf, SimpleGraph.compl_adj] at uprop vprop
+            simp [uprop.right, vprop.right] at padj
+        next => aesop
+>>>>>>> 9287074 (prop2 finished)
 
 theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i) :
   2 * e₂ G p = y * (N.succ - 2 * y + 2 * i) + ∑ j in Finset.range (σ_G hxy).succ, j * (2 *  (tᵢ G 2 y j p : ℤ) - (sᵢ G 2 y j)) := by
@@ -742,6 +1312,7 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i)
     simp [GraphRamsey2RamseyOld] at tmp
     exact tmp
 
+<<<<<<< HEAD
 theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (vᵢ 3 y i) ∧ G.degree v = (vᵢ 3 y i)):
   let p := Exists.choose h -- use classical.choose, is this bad?
   haveI : DecidableRel (H₂ G p).Adj := by apply  instDecidableComapAdj
@@ -757,3 +1328,20 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y):
   let vᵢ := vᵢ 3 y i
   N.succ * e ≥ (∑ i in Finset.range (σ_G hxy).succ, e_x_y_n 3 (y-1) (N.succ - vᵢ - 1) + vᵢ^2) * sᵢ i:= by
   sorry
+=======
+-- theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (vᵢ 3 y i) ∧ G.degree v = (vᵢ 3 y i)):
+--   let p := Exists.choose h -- use classical.choose, is this bad?
+--   haveI : DecidableRel (H₂ G p).Adj := by apply  instDecidableComapAdj
+--   let e₂ := (H₂ G p).edgeFinset.card
+--   e₂ ≤ (y - 1) * (N.succ / 2 - y + 1 + i):= by
+--   sorry
+
+-- noncomputable def e_x_y_n (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
+
+-- theorem Prop₄ (hxy: G.isXYGraph 3 y):
+--   let e := G.edgeFinset.card
+--   let sᵢ := λ i ↦ (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = vᵢ x y i) |>.card
+--   let vᵢ := vᵢ 3 y i
+--   N.succ * e ≥ (∑ i in Finset.range (σ_G hxy).succ, e_x_y_n 3 (y-1) (N.succ - vᵢ - 1) + vᵢ^2) * sᵢ i:= by
+--   sorry
+>>>>>>> 9287074 (prop2 finished)
