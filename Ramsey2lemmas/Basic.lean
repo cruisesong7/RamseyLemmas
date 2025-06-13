@@ -1004,11 +1004,49 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i)
 --   e₂ ≤ (y - 1) * (N.succ / 2 - y + 1 + i):= by
 --   sorry
 
--- noncomputable def e_x_y_n (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
+noncomputable def e_x_y_n (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
 
--- theorem Prop₄ (hxy: G.isXYGraph 3 y):
---   let e := G.edgeFinset.card
---   let sᵢ := λ i ↦ (Finset.univ : Finset (Fin N.succ)).filter (λ v ↦ G.degree v = vᵢ x y i) |>.card
---   let vᵢ := vᵢ 3 y i
---   N.succ * e ≥ (∑ i in Finset.range (σ_G hxy).succ, e_x_y_n 3 (y-1) (N.succ - vᵢ - 1) + vᵢ^2) * sᵢ i:= by
---   sorry
+-- def findᵢ (G : SimpleGraph (Fin N.succ))
+
+theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
+  N.succ * G.edgeFinset.card ≥ (∑ i in Finset.range (σ_G hxy).succ, ((e_x_y_n 3 (y-1) (N.succ - (vᵢ 2 y i) - 1).toNat : ℤ) + (vᵢ 2 y i)^2) * sᵢ G 2 y i) := by
+  sorry
+  -- suffices step1: ∀ p : Fin N.succ, ∃ i, (G.degree p = vᵢ 2 y i ∧ ↑(#G.edgeFinset) ≥
+  -- (↑(e_x_y_n 3 (y - 1) (↑N.succ - vᵢ 2 y i - 1).toNat) + vᵢ 2 y i ^ 2 + (∑ j in Finset.range (σ_G hxy).succ, ((((i - j) : ℤ) * ((G.tᵢ 2 y i p): ℤ))))))
+  -- · conv =>
+  --     lhs
+  --     simp only [G_vertCount_eq G hxy]
+
+  --   suffices step2 : ∑ p : Fin N.succ, (∑ j in Finset.range (σ_G hxy).succ, ((((i - j) : ℤ) * ((G.tᵢ 2 y i p): ℤ)))) * (sᵢ G 2 y i) = 0
+
+
+    -- push_cast
+    -- rw [ge_iff_le, Nat.add_one, Finset.sum_mul]
+    -- apply Finset.sum_le_sum
+
+    -- intros i hi
+    -- rw[mul_comm]
+    -- by_cases h : G.sᵢ 2 y i = 0
+    -- simp [h]
+    -- rw[mul_le_mul_left]
+    -- simp[sᵢ] at h
+    -- replace h := Finset.nonempty_iff_ne_empty.mpr h
+    -- obtain ⟨p, hp⟩ := h
+    -- -- simp at hp
+    -- have :=  step1 p
+    -- rcases this with ⟨ _ , ⟨_, this⟩⟩
+    -- exact ge_iff_le.mp this
+  --   omega
+
+  -- · intros i hi
+
+
+
+
+  -- rw []
+  -- ↑(G.sᵢ x y i)
+
+-- example (h1 : 27 * e ≥ 85 * s0 + 80 * s1 + 75 * s2 + 75 * s3)
+-- (h1 : 2 * e ≤ 7 * s0 + 6 * s1 + 5 * s2 + 4 * s3)
+-- (h3 : s0 + s1 + s2 + s3 = 27) :
+-- e ≥ 80 := by linarith
