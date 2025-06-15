@@ -202,17 +202,59 @@ lemma fintype_indepNum_bddAbove : BddAbove {n | ∃ s, G.IsNIndepSet n s} := by
   rw [← syc.right]
   exact Finset.card_le_card (Finset.subset_univ s)
 
---TODO: prove mono_RamseyOld
-theorem GraphRamsey2RamseyOld : GraphRamsey x y = RamseyOld x y + 1 := by
+theorem GraphRamsey2RamseyOld : GraphRamsey x.succ y.succ = RamseyOld x.succ y.succ + 1 := by
   simp [GraphRamsey]
   rw [Nat.sInf_upward_closed_eq_succ_iff]
   . simp_all
     apply And.intro
     · simp [← noXYGraphIffRamseyGraphProp]
-      intro G _
-      by_contra H
-      sorry
-    · sorry
+      intro G Gxy
+      have GinSup : (sSup {N : ℕ | ∃ (G : SimpleGraph (Fin N)), G.isXYGraph x.succ y.succ} + 1) ∈ {N : ℕ | ∃ (G : SimpleGraph (Fin N)), G.isXYGraph x.succ y.succ} := by
+        simp
+        have fineq : Fintype.card (Fin (RamseyOld x.succ y.succ + 1)) = sSup {N : ℕ | ∃ (G : SimpleGraph (Fin N)), G.isXYGraph x.succ y.succ} + 1:= by simp [RamseyOld]
+        use G.overFin fineq
+        simpa [SimpleGraph.isXYGraph, ← (G.overFinIso fineq).cliqueNum, ← (G.overFinIso fineq).indepNum]
+      have absurd := le_csSup (isXYGraph_bddAbove x.succ y.succ) GinSup
+      simp at absurd
+    · simp [RamseyGraphProp]
+      cases {N : ℕ | ∃ (G : SimpleGraph (Fin N)), G.isXYGraph x.succ y.succ}.eq_empty_or_nonempty with
+      | inl e =>
+        have Rxy0 : Fintype.card (Fin 0) = RamseyOld x.succ y.succ := by simp [RamseyOld, e]
+        use (⊥ : SimpleGraph (Fin 0)).overFin Rxy0
+        apply And.intro
+        · intro xset xNClique
+          rcases xNClique with ⟨xclique, xcard⟩
+          have xsetcardpos : 0 < xset.card := by simp [xcard]
+          rw [Finset.card_pos] at xsetcardpos
+          rcases xsetcardpos with ⟨absurd, _⟩
+          simp [← Rxy0] at absurd
+          apply finZeroElim absurd
+        · intro yset yNClique
+          rcases yNClique with ⟨yclique, ycard⟩
+          have ysetcardpos : 0 < yset.card := by simp [ycard]
+          rw [Finset.card_pos] at ysetcardpos
+          rcases ysetcardpos with ⟨absurd, _⟩
+          simp [← Rxy0] at absurd
+          apply finZeroElim absurd
+      | inr ne =>
+        have sSup_mem := Nat.sSup_mem ne (isXYGraph_bddAbove x.succ y.succ)
+        simp at sSup_mem
+        rcases sSup_mem with ⟨G, Gxy⟩
+        have fineq : Fintype.card (Fin (sSup {N | ∃ (G : SimpleGraph (Fin N)), G.isXYGraph (x + 1) (y + 1)})) = RamseyOld x.succ y.succ := by simp [RamseyOld]
+        use G.overFin fineq
+        simp [SimpleGraph.isXYGraph] at Gxy
+        apply And.intro
+        · intro xset xNClique
+          rcases xNClique with ⟨xsetclique, xsetcard⟩
+          have cliqueNum_bound := xsetclique.card_le_cliqueNum
+          simp [xsetcard, ← (G.overFinIso fineq).cliqueNum] at cliqueNum_bound
+          have absurd : x + 1 < x + 1 := Nat.lt_of_le_of_lt cliqueNum_bound Gxy.left
+          simp at absurd
+        · intro yset yNIndepSet
+          have indepNum_bound := yNIndepSet.isIndepSet.card_le_indepNum
+          simp [yNIndepSet.card_eq, ← (G.overFinIso fineq).indepNum] at indepNum_bound
+          have absurd : y + 1 < y + 1 := Nat.lt_of_le_of_lt indepNum_bound Gxy.right
+          simp at absurd
   · simp
     intro M N MleqN MRamsey
     exact RamseyGraphMonotone MRamsey MleqN
