@@ -1233,7 +1233,6 @@ G.edgeFinset.card ≥ 80 := by
       simp[Finset.range, vᵢ, hr]
       omega
 
-
     replace h3 : ↑(G.sᵢ 2 7 2) + ↑(G.sᵢ 2 7 1) + ↑(G.sᵢ 2 7 0)  = 27 := by
       simp[this, Finset.range] at h3
       linarith
@@ -1263,7 +1262,6 @@ G.edgeFinset.card ≥ 80 := by
       rw[h2]
       simp[Finset.range, vᵢ, hr]
       omega
-
 
     replace h3 : ↑(G.sᵢ 2 7 3) + ↑(G.sᵢ 2 7 2) + ↑(G.sᵢ 2 7 1) + ↑(G.sᵢ 2 7 0) = 27 := by
       simp[this, Finset.range] at h3
@@ -1369,8 +1367,6 @@ G.edgeFinset.card ≥ 88 := by
       rw[h2]
       simp[Finset.range, vᵢ, hr]
       omega
-
-
     replace h3 : ↑(G.sᵢ 2 7 2) + ↑(G.sᵢ 2 7 1) + ↑(G.sᵢ 2 7 0)  = 28 := by
       simp[this, Finset.range] at h3
       linarith
@@ -1404,8 +1400,8 @@ G.edgeFinset.card ≥ 99 := by
   simp[this, hn] at h1
   replace : σ_G hxy ≤ 1 := by
     have := (Prop₁ hxy).2
-    rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
     simp[hr, hn] at this
+    have : RamseyOld 3 7 ≤ 22 := by sorry
     omega
 
   have h2 :=  G_degreeCount_eq G hxy
@@ -1465,3 +1461,104 @@ e_x_y_n 3 8 28 ≥ 99 := by
   have := Ineq₁₁_helper hxy (by norm_num) h3 h4
   rw[h] at this
   exact this
+
+theorem R39Ineq (hxy: G.isXYGraph 3 9) (hn : N.succ = 36)
+(_ : e_x_y_n 3 7 18 ≥ 36)
+(_ : e_x_y_n 3 7 19 ≥ 44)
+(_ : e_x_y_n 3 7 20 ≥ 50)
+(_ : e_x_y_n 3 7 21 ≥ 59):
+G.edgeFinset.card ≥ 144 := by
+  let e := G.edgeFinset.card
+  have : G.edgeFinset.card = e := by simp[e]
+  change e ≥ 144
+  zify at hn
+
+  have hr := RamseyOld₂ 8
+
+  have h1 := Prop₄ 8 hxy
+  simp[this, hn] at h1
+  replace : σ_G hxy ≤ 2 := by
+    have := (Prop₁ hxy).2
+    simp[hr, hn] at this
+    have : RamseyOld 3 8 ≤ 29 := by
+      simp [RamseyOld]
+      apply csSup_le
+      sorry
+      simp
+      intro N G hxy
+      sorry
+    omega
+
+  have h2 := G_degreeCount_eq G hxy
+  have h3 := G_vertCount_eq G hxy
+  have _ := Ineq₉ (by assumption) (by assumption) (by assumption) (by assumption)
+  have _ := Ineq₁₀ (by assumption) (by assumption) (by assumption)
+  have _ := Ineq₁₁ (by assumption) (by assumption)
+
+  interval_cases σ_G hxy
+  · simp[Finset.range] at h1
+    simp[vᵢ, hr] at h1
+    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ):= by
+      suffices (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 144 * ↑(G.sᵢ 2 8 0) by
+        linarith
+      gcongr
+      linarith
+
+    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) := by
+      unfold e
+      simp at h2
+      rw[← sum_degrees_eq_twice_card_edges]
+      zify
+      rw[h2]
+      simp[vᵢ, hr]
+      omega
+
+    replace h3 : ↑(G.sᵢ 2 8 0) = 36 := by
+      simp[this, Finset.range] at h3
+      linarith
+    linarith
+
+  · simp[Finset.range] at h1
+    simp[vᵢ, hr] at h1
+    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1):= by
+      suffices (↑(e_x_y_n 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) + (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0)by
+        linarith
+      gcongr <;>linarith
+
+    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) := by
+      unfold e
+      simp at h2
+      rw[← sum_degrees_eq_twice_card_edges]
+      zify
+      rw[h2]
+      simp[Finset.range, vᵢ, hr]
+      omega
+
+    replace h3 : ↑(G.sᵢ 2 8 1) + ↑(G.sᵢ 2 8 0) = 36 := by
+      simp[this, Finset.range] at h3
+      linarith
+    linarith
+
+  · simp[Finset.range] at h1
+    simp[vᵢ, hr] at h1
+    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1) + 135 * ↑(G.sᵢ 2 8 2):= by
+      suffices (↑(e_x_y_n 3 8 28) + 36) * ↑(G.sᵢ 2 8 2) +
+      (↑(e_x_y_n 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) +
+       (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0)
+       ≥  135 * ↑(G.sᵢ 2 8 2) + 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0) by
+        linarith
+      gcongr <;>linarith
+
+    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) + 6 * ↑(G.sᵢ 2 8 2):= by
+      unfold e
+      simp at h2
+      rw[← sum_degrees_eq_twice_card_edges]
+      zify
+      rw[h2]
+      simp[Finset.range, vᵢ, hr]
+      omega
+
+    replace h3 : ↑(G.sᵢ 2 8 2) + ↑(G.sᵢ 2 8 1) + ↑(G.sᵢ 2 8 0)  = 36 := by
+      simp[this, Finset.range] at h3
+      linarith
+    linarith
