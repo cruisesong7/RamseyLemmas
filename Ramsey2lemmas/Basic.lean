@@ -1117,6 +1117,8 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
 -- (h3 : s0 + s1 + s2 + s3 = 27) :
 -- e ≥ 80 := by linarith
 
+theorem R37 : RamseyOld 3 7 = 22 := sorry
+
 lemma Ineq₉_helper {G : SimpleGraph (Fin 27)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 18 ≥ 36)
 (_ : e 3 7 19 ≥ 44)
@@ -1130,7 +1132,7 @@ G.edgeFinset.card ≥ 80 := by
   replace : σ_G hxy ≤ 3 := by
     have := (Prop₁ hxy).2
     simp [hr] at this
-    rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
+    rw [R37] at this
     omega
 
   have h2 :=  G_degreeCount_eq G hxy
@@ -1245,7 +1247,7 @@ G.edgeFinset.card ≥ 88 := by
   simp [-Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 2 := by
     have := (Prop₁ hxy).2
-    rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
+    rw [R37] at this
     simp [hr] at this
     omega
 
