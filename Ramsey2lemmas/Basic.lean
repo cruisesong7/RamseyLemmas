@@ -1094,7 +1094,8 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i)
 --   e₂ ≤ (y - 1) * (N.succ / 2 - y + 1 + i):= by
 --   sorry
 
-noncomputable def e_x_y_n (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
+noncomputable def e (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
+
 lemma e_nonempty : ∀ x y N : ℕ ,  {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}.Nonempty := by
   suffices ∀ x y, ∃ N : ℕ, ∃ (G : SimpleGraph (Fin N.succ)), G.isXYGraph x y by
     sorry
@@ -1103,7 +1104,7 @@ lemma e_nonempty : ∀ x y N : ℕ ,  {n : ℕ | ∃ (G : SimpleGraph (Fin N.suc
 -- def findᵢ (G : SimpleGraph (Fin N.succ))
 
 theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
-  N.succ * G.edgeFinset.card ≥ (∑ i ∈ Finset.range (σ_G hxy).succ, ((e_x_y_n 3 y (N.succ - (vᵢ 2 y i) - 1).toNat.pred : ℤ) + (vᵢ 2 y i)^2) * sᵢ G 2 y i) := by
+  N.succ * G.edgeFinset.card ≥ (∑ i ∈ Finset.range (σ_G hxy).succ, ((e 3 y (N - (vᵢ 2 y i) - 1).toNat : ℤ) + (vᵢ 2 y i)^2) * sᵢ G 2 y i) := by
   sorry
   -- suffices step1: ∀ p : Fin N.succ, ∃ i, (G.degree p = vᵢ 2 y i ∧ ↑(#G.edgeFinset) ≥
   -- (↑(e_x_y_n 3 (y - 1) (↑N.succ - vᵢ 2 y i - 1).toNat) + vᵢ 2 y i ^ 2 + (∑ j in Finset.range (σ_G hxy).succ, ((((i - j) : ℤ) * ((G.tᵢ 2 y i p): ℤ))))))
@@ -1145,22 +1146,16 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
 -- (h3 : s0 + s1 + s2 + s3 = 27) :
 -- e ≥ 80 := by linarith
 
-lemma Ineq₉_helper (hxy: G.isXYGraph 3 8) (hn : N.succ = 27)
-(_ : e_x_y_n 3 7 18 ≥ 36)
-(_ : e_x_y_n 3 7 19 ≥ 44)
-(_ : e_x_y_n 3 7 20 ≥ 50)
-(_ : e_x_y_n 3 7 21 ≥ 59):
+lemma Ineq₉_helper (hxy: G.isXYGraph 3 8) (hn : N = 26)
+(_ : e 3 7 18 ≥ 36)
+(_ : e 3 7 19 ≥ 44)
+(_ : e 3 7 20 ≥ 50)
+(_ : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 80 := by
-
-  let e := G.edgeFinset.card
-  have : G.edgeFinset.card = e := by simp[e]
-  change e ≥ 80
-  zify at hn
-
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp[this, hn] at h1
+  simp [hn, -Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 3 := by
     have := (Prop₁ hxy).2
     simp[hr, hn] at this
@@ -1171,16 +1166,14 @@ G.edgeFinset.card ≥ 80 := by
   have h3 := G_vertCount_eq G hxy
 
   interval_cases σ_G hxy
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 27 * e ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
-      suffices (↑(e_x_y_n 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥ 85 * ↑(G.sᵢ 2 7 0) by
+  · simp [Finset.range, vᵢ, hr, -Set.toFinset_card] at h1
+    replace h1 : 27 * G.edgeFinset.card ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
+      suffices (↑(e 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥ 85 * ↑(G.sᵢ 2 7 0) by
         linarith
       gcongr
       linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1193,15 +1186,13 @@ G.edgeFinset.card ≥ 80 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 27 * e ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ) + 80 * ↑(G.sᵢ 2 7 1):= by
-      suffices (↑(e_x_y_n 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e_x_y_n 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥ 80 * ↑(G.sᵢ 2 7 1) + 85 * ↑(G.sᵢ 2 7 0)by
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 27 * G.edgeFinset.card ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ) + 80 * ↑(G.sᵢ 2 7 1):= by
+      suffices (↑(e 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥ 80 * ↑(G.sᵢ 2 7 1) + 85 * ↑(G.sᵢ 2 7 0)by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1214,18 +1205,16 @@ G.edgeFinset.card ≥ 80 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 27 * e ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ) + 80 * ↑(G.sᵢ 2 7 1) + 75 * ↑(G.sᵢ 2 7 2):= by
-      suffices (↑(e_x_y_n 3 7 20) + 25) * ↑(G.sᵢ 2 7 2) +
-      (↑(e_x_y_n 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) +
-       (↑(e_x_y_n 3 7 18) + 49) * ↑(G.sᵢ 2 7 0)
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 27 * G.edgeFinset.card ≥ 85 * (↑(G.sᵢ 2 7 0) : ℤ ) + 80 * ↑(G.sᵢ 2 7 1) + 75 * ↑(G.sᵢ 2 7 2):= by
+      suffices (↑(e 3 7 20) + 25) * ↑(G.sᵢ 2 7 2) +
+      (↑(e 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) +
+       (↑(e 3 7 18) + 49) * ↑(G.sᵢ 2 7 0)
        ≥  75 * ↑(G.sᵢ 2 7 2) + 80 * ↑(G.sᵢ 2 7 1) + 85 * ↑(G.sᵢ 2 7 0) by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) + 5 * ↑(G.sᵢ 2 7 2):= by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) + 5 * ↑(G.sᵢ 2 7 2):= by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1238,24 +1227,21 @@ G.edgeFinset.card ≥ 80 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    simp[← add_assoc] at h1
-    replace h1 : 27 * e ≥ 85 * ↑(G.sᵢ 2 7 0) + 80 * ↑(G.sᵢ 2 7 1) + 75 * ↑(G.sᵢ 2 7 2) + 75 * (G.sᵢ 2 7 3) := by
-      suffices (↑(e_x_y_n 3 7 21) + 16) * ↑(G.sᵢ 2 7 3) + (↑(e_x_y_n 3 7 20) + 25) * ↑(G.sᵢ 2 7 2) +
-        (↑(e_x_y_n 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) +
-      (↑(e_x_y_n 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥
+  · simp [vᵢ, hr, Finset.range, ←Nat.add_assoc, -Set.toFinset_card] at h1
+    replace h1 : 27 * G.edgeFinset.card ≥ 85 * ↑(G.sᵢ 2 7 0) + 80 * ↑(G.sᵢ 2 7 1) + 75 * ↑(G.sᵢ 2 7 2) + 75 * (G.sᵢ 2 7 3) := by
+      suffices (↑(e 3 7 21) + 16) * ↑(G.sᵢ 2 7 3) + (↑(e 3 7 20) + 25) * ↑(G.sᵢ 2 7 2) +
+        (↑(e 3 7 19) + 36) * ↑(G.sᵢ 2 7 1) +
+      (↑(e 3 7 18) + 49) * ↑(G.sᵢ 2 7 0) ≥
             75 * (G.sᵢ 2 7 3) + 75 * ↑(G.sᵢ 2 7 2) + 80 * ↑(G.sᵢ 2 7 1) + 85 * ↑(G.sᵢ 2 7 0) by
         linarith
       simp
       gcongr <;>linarith
 
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +
       6 * ↑(G.sᵢ 2 7 1) +
         5 * ↑(G.sᵢ 2 7 2) +
           4  * ↑(G.sᵢ 2 7 3) := by
-      unfold e
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1269,33 +1255,27 @@ G.edgeFinset.card ≥ 80 := by
 
     linarith
 
-theorem Ineq₉ (h1 : e_x_y_n 3 7 18 ≥ 36)
-(h2 : e_x_y_n 3 7 19 ≥ 44)
-(h3 : e_x_y_n 3 7 20 ≥ 50)
-(h4 : e_x_y_n 3 7 21 ≥ 59):
-e_x_y_n 3 8 26 ≥ 80 := by
-  simp only [e_x_y_n]
+theorem Ineq₉ (h1 : e 3 7 18 ≥ 36)
+(h2 : e 3 7 19 ≥ 44)
+(h3 : e 3 7 20 ≥ 50)
+(h4 : e 3 7 21 ≥ 59):
+e 3 8 26 ≥ 80 := by
+  simp only [e]
   have := Nat.sInf_mem  (e_nonempty 3 8 26)
   obtain ⟨G, _, hxy, h⟩ := this
   have := Ineq₉_helper hxy (by norm_num) h1 h2 h3 h4
   rw[h] at this
   exact this
 
-lemma Ineq₁₀_helper (hxy: G.isXYGraph 3 8) (hn : N.succ = 28)
-(_ : e_x_y_n 3 7 19 ≥ 44)
-(_ : e_x_y_n 3 7 20 ≥ 50)
-(_ : e_x_y_n 3 7 21 ≥ 59):
+lemma Ineq₁₀_helper (hxy: G.isXYGraph 3 8) (hn : N = 27)
+(_ : e 3 7 19 ≥ 44)
+(_ : e 3 7 20 ≥ 50)
+(_ : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 88 := by
-
-  let e := G.edgeFinset.card
-  have : G.edgeFinset.card = e := by simp[e]
-  change e ≥ 88
-  zify at hn
-
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp[this, hn] at h1
+  simp [hn, -Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 2 := by
     have := (Prop₁ hxy).2
     rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
@@ -1306,16 +1286,14 @@ G.edgeFinset.card ≥ 88 := by
   have h3 := G_vertCount_eq G hxy
 
   interval_cases σ_G hxy
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 28 * e ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
-      suffices (↑(e_x_y_n 3 7 19) + 49) * ↑(G.sᵢ 2 7 0) ≥ 93 * ↑(G.sᵢ 2 7 0) by
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 28 * G.edgeFinset.card ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
+      suffices (↑(e 3 7 19) + 49) * ↑(G.sᵢ 2 7 0) ≥ 93 * ↑(G.sᵢ 2 7 0) by
         linarith
       gcongr
       linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1328,15 +1306,13 @@ G.edgeFinset.card ≥ 88 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 28 * e ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ) + 86 * ↑(G.sᵢ 2 7 1):= by
-      suffices (↑(e_x_y_n 3 7 20) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e_x_y_n 3 7 19) + 49) * ↑(G.sᵢ 2 7 0) ≥ 86 * ↑(G.sᵢ 2 7 1) + 93 * ↑(G.sᵢ 2 7 0)by
+  · simp[vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 28 * G.edgeFinset.card ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ) + 86 * ↑(G.sᵢ 2 7 1):= by
+      suffices (↑(e 3 7 20) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e 3 7 19) + 49) * ↑(G.sᵢ 2 7 0) ≥ 86 * ↑(G.sᵢ 2 7 1) + 93 * ↑(G.sᵢ 2 7 0)by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1349,18 +1325,16 @@ G.edgeFinset.card ≥ 88 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 28 * e ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ) + 86 * ↑(G.sᵢ 2 7 1) + 84 * ↑(G.sᵢ 2 7 2):= by
-      suffices (↑(e_x_y_n 3 7 21) + 25) * ↑(G.sᵢ 2 7 2) +
-      (↑(e_x_y_n 3 7 20) + 36) * ↑(G.sᵢ 2 7 1) +
-       (↑(e_x_y_n 3 7 19) + 49) * ↑(G.sᵢ 2 7 0)
+  · simp[vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 28 * G.edgeFinset.card ≥ 93 * (↑(G.sᵢ 2 7 0) : ℤ ) + 86 * ↑(G.sᵢ 2 7 1) + 84 * ↑(G.sᵢ 2 7 2):= by
+      suffices (↑(e 3 7 21) + 25) * ↑(G.sᵢ 2 7 2) +
+      (↑(e 3 7 20) + 36) * ↑(G.sᵢ 2 7 1) +
+       (↑(e 3 7 19) + 49) * ↑(G.sᵢ 2 7 0)
        ≥  84 * ↑(G.sᵢ 2 7 2) + 86 * ↑(G.sᵢ 2 7 1) + 93 * ↑(G.sᵢ 2 7 0) by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) + 5 * ↑(G.sᵢ 2 7 2):= by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) + 5 * ↑(G.sᵢ 2 7 2):= by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1373,31 +1347,25 @@ G.edgeFinset.card ≥ 88 := by
     linarith
 
 theorem Ineq₁₀
-(h2 : e_x_y_n 3 7 19 ≥ 44)
-(h3 : e_x_y_n 3 7 20 ≥ 50)
-(h4 : e_x_y_n 3 7 21 ≥ 59):
-e_x_y_n 3 8 27 ≥ 88 := by
-  simp only [e_x_y_n]
+(h2 : e 3 7 19 ≥ 44)
+(h3 : e 3 7 20 ≥ 50)
+(h4 : e 3 7 21 ≥ 59):
+e 3 8 27 ≥ 88 := by
+  simp only [e]
   have := Nat.sInf_mem  (e_nonempty 3 8 27)
   obtain ⟨G, _, hxy, h⟩ := this
   have := Ineq₁₀_helper hxy (by norm_num) h2 h3 h4
   rw[h] at this
   exact this
 
-lemma Ineq₁₁_helper (hxy: G.isXYGraph 3 8) (hn : N.succ = 29)
-(_ : e_x_y_n 3 7 20 ≥ 50)
-(_ : e_x_y_n 3 7 21 ≥ 59):
+lemma Ineq₁₁_helper (hxy: G.isXYGraph 3 8) (hn : N = 28)
+(_ : e 3 7 20 ≥ 50)
+(_ : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 99 := by
-
-  let e := G.edgeFinset.card
-  have : G.edgeFinset.card = e := by simp[e]
-  change e ≥ 99
-  zify at hn
-
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp[this, hn] at h1
+  simp [hn, -Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 1 := by
     have := (Prop₁ hxy).2
     simp[hr, hn] at this
@@ -1408,16 +1376,14 @@ G.edgeFinset.card ≥ 99 := by
   have h3 := G_vertCount_eq G hxy
 
   interval_cases σ_G hxy
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 29 * e ≥ 99 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
-      suffices (↑(e_x_y_n 3 7 20) + 49) * ↑(G.sᵢ 2 7 0) ≥ 99 * ↑(G.sᵢ 2 7 0) by
+  · simp[vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 29 * G.edgeFinset.card ≥ 99 * (↑(G.sᵢ 2 7 0) : ℤ ):= by
+      suffices (↑(e 3 7 20) + 49) * ↑(G.sᵢ 2 7 0) ≥ 99 * ↑(G.sᵢ 2 7 0) by
         linarith
       gcongr
       linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1430,15 +1396,13 @@ G.edgeFinset.card ≥ 99 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 29 * e ≥ 99 * (↑(G.sᵢ 2 7 0) : ℤ ) + 95 * ↑(G.sᵢ 2 7 1):= by
-      suffices (↑(e_x_y_n 3 7 21) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e_x_y_n 3 7 20) + 49) * ↑(G.sᵢ 2 7 0) ≥ 95 * ↑(G.sᵢ 2 7 1) + 99 * ↑(G.sᵢ 2 7 0)by
+  · simp[vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 29 * G.edgeFinset.card ≥ 99 * (↑(G.sᵢ 2 7 0) : ℤ ) + 95 * ↑(G.sᵢ 2 7 1):= by
+      suffices (↑(e 3 7 21) + 36) * ↑(G.sᵢ 2 7 1) + (↑(e 3 7 20) + 49) * ↑(G.sᵢ 2 7 0) ≥ 95 * ↑(G.sᵢ 2 7 1) + 99 * ↑(G.sᵢ 2 7 0)by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 7 * ↑(G.sᵢ 2 7 0) +  6 * ↑(G.sᵢ 2 7 1) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1452,31 +1416,26 @@ G.edgeFinset.card ≥ 99 := by
     linarith
 
 theorem Ineq₁₁
-(h3 : e_x_y_n 3 7 20 ≥ 50)
-(h4 : e_x_y_n 3 7 21 ≥ 59):
-e_x_y_n 3 8 28 ≥ 99 := by
-  simp only [e_x_y_n]
+(h3 : e 3 7 20 ≥ 50)
+(h4 : e 3 7 21 ≥ 59):
+e 3 8 28 ≥ 99 := by
+  simp only [e]
   have := Nat.sInf_mem  (e_nonempty 3 8 28)
   obtain ⟨G, _, hxy, h⟩ := this
   have := Ineq₁₁_helper hxy (by norm_num) h3 h4
   rw[h] at this
   exact this
 
-theorem R39Ineq (hxy: G.isXYGraph 3 9) (hn : N.succ = 36)
-(_ : e_x_y_n 3 7 18 ≥ 36)
-(_ : e_x_y_n 3 7 19 ≥ 44)
-(_ : e_x_y_n 3 7 20 ≥ 50)
-(_ : e_x_y_n 3 7 21 ≥ 59):
+theorem R39Ineq (hxy: G.isXYGraph 3 9) (hn : N = 35)
+(_ : e 3 7 18 ≥ 36)
+(_ : e 3 7 19 ≥ 44)
+(_ : e 3 7 20 ≥ 50)
+(_ : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 144 := by
-  let e := G.edgeFinset.card
-  have : G.edgeFinset.card = e := by simp[e]
-  change e ≥ 144
-  zify at hn
-
   have hr := RamseyOld₂ 8
 
   have h1 := Prop₄ 8 hxy
-  simp[this, hn] at h1
+  simp [hn, -Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 2 := by
     have := (Prop₁ hxy).2
     simp[hr, hn] at this
@@ -1496,16 +1455,14 @@ G.edgeFinset.card ≥ 144 := by
   have _ := Ineq₁₁ (by assumption) (by assumption)
 
   interval_cases σ_G hxy
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ):= by
-      suffices (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 144 * ↑(G.sᵢ 2 8 0) by
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ):= by
+      suffices (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 144 * ↑(G.sᵢ 2 8 0) by
         linarith
       gcongr
       linarith
 
-    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1518,15 +1475,13 @@ G.edgeFinset.card ≥ 144 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1):= by
-      suffices (↑(e_x_y_n 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) + (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0)by
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1):= by
+      suffices (↑(e 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) + (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0)by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) := by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) := by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
@@ -1539,18 +1494,16 @@ G.edgeFinset.card ≥ 144 := by
       linarith
     linarith
 
-  · simp[Finset.range] at h1
-    simp[vᵢ, hr] at h1
-    replace h1 : 36 * e ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1) + 135 * ↑(G.sᵢ 2 8 2):= by
-      suffices (↑(e_x_y_n 3 8 28) + 36) * ↑(G.sᵢ 2 8 2) +
-      (↑(e_x_y_n 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) +
-       (↑(e_x_y_n 3 8 26) + 64) * ↑(G.sᵢ 2 8 0)
+  · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
+    replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1) + 135 * ↑(G.sᵢ 2 8 2):= by
+      suffices (↑(e 3 8 28) + 36) * ↑(G.sᵢ 2 8 2) +
+      (↑(e 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) +
+       (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0)
        ≥  135 * ↑(G.sᵢ 2 8 2) + 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0) by
         linarith
       gcongr <;>linarith
 
-    replace h2 : 2 * e = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) + 6 * ↑(G.sᵢ 2 8 2):= by
-      unfold e
+    replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) + 6 * ↑(G.sᵢ 2 8 2):= by
       simp at h2
       rw[← sum_degrees_eq_twice_card_edges]
       zify
