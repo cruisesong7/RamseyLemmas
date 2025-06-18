@@ -1388,10 +1388,10 @@ e 3 8 28 ≥ 99 := by
   sorry
 
 theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9)
-(_ : e 3 7 18 ≥ 36)
-(_ : e 3 7 19 ≥ 44)
-(_ : e 3 7 20 ≥ 50)
-(_ : e 3 7 21 ≥ 59):
+(ineq36 : e 3 7 18 ≥ 36)
+(ineq44 : e 3 7 19 ≥ 44)
+(ineq50 : e 3 7 20 ≥ 50)
+(ineq59 : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 144 := by
   have hr := RamseyOld₂ 8
 
@@ -1411,9 +1411,9 @@ G.edgeFinset.card ≥ 144 := by
 
   have h2 := G_degreeCount_eq G hxy
   have h3 := G_vertCount_eq G hxy
-  have _ := Ineq₉ (by assumption) (by assumption) (by assumption) (by assumption)
-  have _ := Ineq₁₀ (by assumption) (by assumption) (by assumption)
-  have _ := Ineq₁₁ (by assumption) (by assumption)
+  have _ := Ineq₉ ineq36 ineq44 ineq50 ineq59
+  have _ := Ineq₁₀ ineq44 ineq50 ineq59
+  have _ := Ineq₁₁ ineq50 ineq59
 
   interval_cases σ_G hxy
   · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
