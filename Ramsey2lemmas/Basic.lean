@@ -266,28 +266,6 @@ theorem RamseyOld₂ : ∀ y : ℕ, RamseyOld 2 y.succ = y := by
   simp
   exact GraphRamsey2 (y)
 
-theorem RamseyOldFinite : ∀ x y : ℕ, { N : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x.succ y.succ }.Nonempty := by
-  -- intro x y
-  -- simp [Set.Nonempty]
-  -- by_contra! h
-  -- replace h : ∀ (N : ℕ), RamseyGraphProp N.succ x.succ y.succ := by
-  --   intro N
-  --   specialize h N
-  --   have := noXYGraphIffRamseyGraphProp x.succ y.succ N.succ
-  --   simp_all
-  -- specialize h (GraphRamsey x.succ y.succ).pred
-  -- simp[GraphRamsey] at h
-  -- have absurd : (sInf {N | RamseyGraphProp N (x + 1) (y + 1)} - 1 + 1) ∈ {N | RamseyGraphProp N (x + 1) (y + 1)} := by simp; exact h
-  -- have : BddBelow {N | RamseyGraphProp N (x + 1) (y + 1)} := by sorry
-  -- replace := csInf_le this absurd
-  -- have : sInf {N | RamseyGraphProp N (x + 1) (y + 1)} > 0 := by
-  --   by_contra!; simp at this
-  --   cases this with
-  --   | inl Ramsey0 => simp[RamseyGraphProp]; sorry
-  --   | inr => sorry
-  -- omega
-  sorry
-----------------------------------------------------------------------
 variable (i : ℕ) (G) [DecidableRel G.Adj]
 
 noncomputable abbrev vᵢ : ℤ := RamseyOld x y.succ - i
@@ -1096,13 +1074,6 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i)
 
 noncomputable def e (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
 
-lemma e_nonempty : ∀ x y N : ℕ ,  {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}.Nonempty := by
-  suffices ∀ x y, ∃ N : ℕ, ∃ (G : SimpleGraph (Fin N.succ)), G.isXYGraph x y by
-    sorry
-  sorry
-
--- def findᵢ (G : SimpleGraph (Fin N.succ))
-
 theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
   N.succ * G.edgeFinset.card ≥ (∑ i ∈ Finset.range (σ_G hxy).succ, ((e 3 y (N - (vᵢ 2 y i) - 1).toNat : ℤ) + (vᵢ 2 y i)^2) * sᵢ G 2 y i) := by
   sorry
@@ -1146,7 +1117,7 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
 -- (h3 : s0 + s1 + s2 + s3 = 27) :
 -- e ≥ 80 := by linarith
 
-lemma Ineq₉_helper (hxy: G.isXYGraph 3 8) (hn : N = 26)
+lemma Ineq₉_helper {G : SimpleGraph (Fin 27)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 18 ≥ 36)
 (_ : e 3 7 19 ≥ 44)
 (_ : e 3 7 20 ≥ 50)
@@ -1155,10 +1126,10 @@ G.edgeFinset.card ≥ 80 := by
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp [hn, -Set.toFinset_card] at h1
+  simp [-Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 3 := by
     have := (Prop₁ hxy).2
-    simp[hr, hn] at this
+    simp [hr] at this
     rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
     omega
 
@@ -1261,13 +1232,9 @@ theorem Ineq₉ (h1 : e 3 7 18 ≥ 36)
 (h4 : e 3 7 21 ≥ 59):
 e 3 8 26 ≥ 80 := by
   simp only [e]
-  have := Nat.sInf_mem  (e_nonempty 3 8 26)
-  obtain ⟨G, _, hxy, h⟩ := this
-  have := Ineq₉_helper hxy (by norm_num) h1 h2 h3 h4
-  rw[h] at this
-  exact this
+  sorry
 
-lemma Ineq₁₀_helper (hxy: G.isXYGraph 3 8) (hn : N = 27)
+lemma Ineq₁₀_helper {G : SimpleGraph (Fin 28)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 19 ≥ 44)
 (_ : e 3 7 20 ≥ 50)
 (_ : e 3 7 21 ≥ 59):
@@ -1275,11 +1242,11 @@ G.edgeFinset.card ≥ 88 := by
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp [hn, -Set.toFinset_card] at h1
+  simp [-Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 2 := by
     have := (Prop₁ hxy).2
     rw[show RamseyOld (Nat.succ 2) 7 = 22 by sorry] at this
-    simp[hr, hn] at this
+    simp [hr] at this
     omega
 
   have h2 :=  G_degreeCount_eq G hxy
@@ -1352,23 +1319,19 @@ theorem Ineq₁₀
 (h4 : e 3 7 21 ≥ 59):
 e 3 8 27 ≥ 88 := by
   simp only [e]
-  have := Nat.sInf_mem  (e_nonempty 3 8 27)
-  obtain ⟨G, _, hxy, h⟩ := this
-  have := Ineq₁₀_helper hxy (by norm_num) h2 h3 h4
-  rw[h] at this
-  exact this
+  sorry
 
-lemma Ineq₁₁_helper (hxy: G.isXYGraph 3 8) (hn : N = 28)
+lemma Ineq₁₁_helper {G : SimpleGraph (Fin 29)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 20 ≥ 50)
 (_ : e 3 7 21 ≥ 59):
 G.edgeFinset.card ≥ 99 := by
   have hr := RamseyOld₂ 7
 
   have h1 := Prop₄ 7 hxy
-  simp [hn, -Set.toFinset_card] at h1
+  simp [-Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 1 := by
     have := (Prop₁ hxy).2
-    simp[hr, hn] at this
+    simp [hr] at this
     have : RamseyOld 3 7 ≤ 22 := by sorry
     omega
 
@@ -1420,13 +1383,9 @@ theorem Ineq₁₁
 (h4 : e 3 7 21 ≥ 59):
 e 3 8 28 ≥ 99 := by
   simp only [e]
-  have := Nat.sInf_mem  (e_nonempty 3 8 28)
-  obtain ⟨G, _, hxy, h⟩ := this
-  have := Ineq₁₁_helper hxy (by norm_num) h3 h4
-  rw[h] at this
-  exact this
+  sorry
 
-theorem R39Ineq (hxy: G.isXYGraph 3 9) (hn : N = 35)
+theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9)
 (_ : e 3 7 18 ≥ 36)
 (_ : e 3 7 19 ≥ 44)
 (_ : e 3 7 20 ≥ 50)
@@ -1435,10 +1394,10 @@ G.edgeFinset.card ≥ 144 := by
   have hr := RamseyOld₂ 8
 
   have h1 := Prop₄ 8 hxy
-  simp [hn, -Set.toFinset_card] at h1
+  simp [-Set.toFinset_card] at h1
   replace : σ_G hxy ≤ 2 := by
     have := (Prop₁ hxy).2
-    simp[hr, hn] at this
+    simp [hr] at this
     have : RamseyOld 3 8 ≤ 29 := by
       simp [RamseyOld]
       apply csSup_le
