@@ -1134,7 +1134,12 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
 -- e ≥ 80 := by linarith
 
 theorem R37 : RamseyOld 3 7 = 22 := sorry
--- theorem R38_GoodGraph : ∃
+
+lemma e37_18 : e 3 7 18 ≥ 36 := by sorry
+lemma e37_19 : e 3 7 19 ≥ 44 := by sorry
+lemma e37_20 : e 3 7 20 ≥ 50 := by sorry
+lemma e37_21 : e 3 7 21 ≥ 59 := by sorry
+
 lemma Ineq₉_helper {G : SimpleGraph (Fin 27)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 18 ≥ 36)
 (_ : e 3 7 19 ≥ 44)
@@ -1244,10 +1249,7 @@ G.edgeFinset.card ≥ 80 := by
 
     linarith
 
-theorem Ineq₉ (h1 : e 3 7 18 ≥ 36)
-(h2 : e 3 7 19 ≥ 44)
-(h3 : e 3 7 20 ≥ 50)
-(h4 : e 3 7 21 ≥ 59):
+theorem Ineq₉:
 e 3 8 26 ≥ 80 := by
   simp only [e]
   sorry
@@ -1345,19 +1347,17 @@ G.edgeFinset.card ≥ 88 := by
       linarith
     linarith
 
-theorem Ineq₁₀
-(h2 : e 3 7 19 ≥ 44)
-(h3 : e 3 7 20 ≥ 50)
-(h4 : e 3 7 21 ≥ 59):
+theorem Ineq₁₀:
 e 3 8 27 ≥ 88 := by
   simp only [e]
-  apply le_csInf
-  simp [Set.Nonempty, -Set.toFinset_card]
   sorry
-  simp [-Set.toFinset_card]
-  intro N G hxy _ hn
-  have := Ineq₉_helper hxy h1 h2 h3 h4
-  omega
+  -- apply le_csInf
+  -- simp [Set.Nonempty, -Set.toFinset_card]
+  -- sorry
+  -- simp [-Set.toFinset_card]
+  -- intro N G hxy _ hn
+  -- have := Ineq₉_helper hxy h1 h2 h3 h4
+  -- omega
 
 lemma Ineq₁₁_helper {G : SimpleGraph (Fin 29)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 20 ≥ 50)
@@ -1416,18 +1416,12 @@ G.edgeFinset.card ≥ 99 := by
       linarith
     linarith
 
-theorem Ineq₁₁
-(h3 : e 3 7 20 ≥ 50)
-(h4 : e 3 7 21 ≥ 59):
+theorem Ineq₁₁:
 e 3 8 28 ≥ 99 := by
   simp only [e]
   sorry
 
-theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9)
-(ineq36 : e 3 7 18 ≥ 36)
-(ineq44 : e 3 7 19 ≥ 44)
-(ineq50 : e 3 7 20 ≥ 50)
-(ineq59 : e 3 7 21 ≥ 59):
+theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
 G.edgeFinset.card ≥ 144 := by
   have hr := RamseyOld₂ 8
 
@@ -1447,9 +1441,9 @@ G.edgeFinset.card ≥ 144 := by
 
   have h2 := G_degreeCount_eq G hxy
   have h3 := G_vertCount_eq G hxy
-  have _ := Ineq₉ ineq36 ineq44 ineq50 ineq59
-  have _ := Ineq₁₀ ineq44 ineq50 ineq59
-  have _ := Ineq₁₁ ineq50 ineq59
+  have _ := Ineq₉
+  have _ := Ineq₁₀
+  have _ := Ineq₁₁
 
   interval_cases σ_G hxy
   · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
@@ -1512,3 +1506,64 @@ G.edgeFinset.card ≥ 144 := by
       simp[this, Finset.range] at h3
       linarith
     linarith
+
+lemma R3y_neighbor_Ind {G : SimpleGraph (Fin N.succ)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 y.succ) :
+  ∀ p : Fin (N.succ),  G.IsNIndepSet (G.degree p) (G.neighborFinset p) := by
+  intro p
+  by_contra! absurd
+  simp [isNIndepSet_iff, isIndepSet_iff, Set.Pairwise] at absurd
+  obtain ⟨u, adj_up, v,adj_vp, v_neq_u, adj_uv⟩ := absurd
+
+  have hx := (csSup_le_iff' fintype_cliqueNum_bddAbove).mp (Nat.le_pred_of_lt hxy.1)
+  simp at hx
+  specialize hx 3 {p, u, v}
+  suffices G.IsNClique 3 {p, u, v} by
+    linarith [hx this]
+  simp[isNClique_iff]
+  have : p ≠ v := by by_contra!; simp[this] at adj_vp
+  have : p ≠ u := by by_contra!; simp[this] at adj_up
+  simp_all
+
+theorem R39_36_graph_IsRegular8 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
+  G.IsRegularOfDegree 8 := by
+  simp[IsRegularOfDegree]
+  have h_neighbor := R3y_neighbor_Ind 8 hxy
+
+  have deg_le: ∀ p ∈ Finset.univ, G.degree p ≤ 8 := by
+    intro p
+    by_contra!
+    simp[isXYGraph, cliqueNum, indepNum] at hxy
+    have hy := (csSup_le_iff' fintype_indepNum_bddAbove).mp (Nat.le_pred_of_lt hxy.2)
+    simp at hy
+    specialize hy (G.degree p) (G.neighborFinset p)
+    specialize h_neighbor p
+    linarith [hy h_neighbor]
+
+  have _ := R39Ineq hxy
+  have h1 : 2 * 144 ≤ 2 * #G.edgeFinset := by linarith
+  rw[← sum_degrees_eq_twice_card_edges] at h1
+  norm_num at h1
+  have h2 : ∑ v : Fin 36, G.degree v ≤ ∑ p : Fin 36, 8 := by
+    apply Finset.sum_le_sum
+    exact deg_le
+
+  have sum_deg_eq : ∑ v : Fin 36, G.degree v = ∑ p : Fin 36, 8 := by norm_num at *; linarith
+  have := (Finset.sum_eq_sum_iff_of_le deg_le).mp sum_deg_eq
+  simp at this
+  exact this
+
+theorem R39_36_graph_has_R38_27 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
+ ∃ (s : Finset (Fin 36)),s.card = 27 ∧ ((G.induce s).isXYGraph 3 8) := by
+  use Gᶜ.neighborFinset 0
+  simp [SimpleGraph.degree_compl, R39_36_graph_IsRegular8 hxy 0]
+  simp[isXYGraph]
+  by_contra! absurd
+  simp [isXYGraph] at *
+  by_cases hclique : (induce (↑(Gᶜ.neighborFinset 0)) G).cliqueNum < 3
+  specialize absurd hclique
+  suffices (induce (↑(Gᶜ.neighborFinset 0)) G).indepNum ≤ G.cliqueNum - 1 by
+    omega
+  simp [indepNum, cliqueNum]
+  -- apply csInf_le
+  sorry
+  sorry
