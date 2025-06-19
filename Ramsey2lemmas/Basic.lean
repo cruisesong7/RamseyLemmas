@@ -1074,6 +1074,22 @@ theorem Corollary₂  (hxy : G.isXYGraph 3 y.succ) (hp: G.degree p = vᵢ 2 y i)
 
 noncomputable def e (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
 
+-- noncomputable def e (x y N : ℕ) : ℕ :=
+
+--   let allGraphs : Finset (SimpleGraph (Fin N.succ)) := Finset.univ
+--   haveI :  DecidablePred (fun (G : SimpleGraph (Fin (N.succ))) => G.isXYGraph x y) := by unfold isXYGraph; infer_instance
+--   let xyGraphs := allGraphs.filter (fun(G : SimpleGraph (Fin (N.succ))) => G.isXYGraph x y )
+
+--   let counts := xyGraphs.image (fun G => G.edgeSet.ncard)
+
+--   if h : counts.Nonempty then
+--     counts.min' h
+--   else
+--     0
+
+
+
+
 theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
   N.succ * G.edgeFinset.card ≥ (∑ i ∈ Finset.range (σ_G hxy).succ, ((e 3 y (N - (vᵢ 2 y i) - 1).toNat : ℤ) + (vᵢ 2 y i)^2) * sᵢ G 2 y i) := by
   sorry
@@ -1118,7 +1134,7 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ):
 -- e ≥ 80 := by linarith
 
 theorem R37 : RamseyOld 3 7 = 22 := sorry
-
+-- theorem R38_GoodGraph : ∃
 lemma Ineq₉_helper {G : SimpleGraph (Fin 27)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 18 ≥ 36)
 (_ : e 3 7 19 ≥ 44)
@@ -1235,6 +1251,20 @@ theorem Ineq₉ (h1 : e 3 7 18 ≥ 36)
 e 3 8 26 ≥ 80 := by
   simp only [e]
   sorry
+  -- apply le_csInf
+  -- simp [Set.Nonempty, -Set.toFinset_card, isXYGraph]
+  -- use sorry
+  -- let G := readG6 "Z????CDO?a@PHA_HcE_dc`PCXQ@PoSWo@_cDS_YQQB_Qo?TLSO?q_g?{p?_?"
+  -- use G
+  -- apply And.intro
+  -- have : G.cliqueFinset 3 = Finset.empty := by native_decide
+  -- native_decide
+
+  -- sorry
+  -- simp [-Set.toFinset_card]
+  -- intro N G hxy _ hn
+  -- have := Ineq₉_helper hxy h1 h2 h3 h4
+  -- omega
 
 lemma Ineq₁₀_helper {G : SimpleGraph (Fin 28)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 19 ≥ 44)
@@ -1321,7 +1351,13 @@ theorem Ineq₁₀
 (h4 : e 3 7 21 ≥ 59):
 e 3 8 27 ≥ 88 := by
   simp only [e]
+  apply le_csInf
+  simp [Set.Nonempty, -Set.toFinset_card]
   sorry
+  simp [-Set.toFinset_card]
+  intro N G hxy _ hn
+  have := Ineq₉_helper hxy h1 h2 h3 h4
+  omega
 
 lemma Ineq₁₁_helper {G : SimpleGraph (Fin 29)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8)
 (_ : e 3 7 20 ≥ 50)
