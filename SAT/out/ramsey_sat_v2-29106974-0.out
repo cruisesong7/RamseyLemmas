@@ -1,0 +1,7 @@
+Task ID: 0
+Job running on: gra83
+CNF file: 3_7_19_35_enc_pairwise.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 03:45:14 PM EDT 2025
+cadical: error: 3_7_19_35_enc_pairwise.cnf:1: parse error: expected 'c' or 'p'
+End time: Fri Jun 20 03:45:14 PM EDT 2025

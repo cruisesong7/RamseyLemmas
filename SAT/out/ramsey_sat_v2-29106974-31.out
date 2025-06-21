@@ -1,0 +1,6 @@
+Task ID: 31
+Job running on: gra70
+CNF file: 3_7_22_58_enc_seqcounter.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 04:01:23 PM EDT 2025
+slurmstepd: error: *** JOB 29107752 ON gra70 CANCELLED AT 2025-06-20T22:01:50 DUE TO TIME LIMIT ***

@@ -1,0 +1,6 @@
+Task ID: 9
+Job running on: gra153
+CNF file: 3_7_19_35_enc_native.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 03:51:44 PM EDT 2025
+slurmstepd: error: *** JOB 29107622 ON gra153 CANCELLED AT 2025-06-20T21:51:48 DUE TO TIME LIMIT ***

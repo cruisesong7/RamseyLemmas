@@ -1,0 +1,6 @@
+Task ID: 29
+Job running on: gra64
+CNF file: 3_7_21_49_enc_native.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 04:01:23 PM EDT 2025
+slurmstepd: error: *** JOB 29107750 ON gra64 CANCELLED AT 2025-06-20T22:01:50 DUE TO TIME LIMIT ***

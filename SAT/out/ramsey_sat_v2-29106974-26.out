@@ -1,0 +1,6 @@
+Task ID: 26
+Job running on: gra63
+CNF file: 3_7_21_49_enc_totalizer.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 04:01:23 PM EDT 2025
+slurmstepd: error: *** JOB 29107747 ON gra63 CANCELLED AT 2025-06-20T22:01:50 DUE TO TIME LIMIT ***

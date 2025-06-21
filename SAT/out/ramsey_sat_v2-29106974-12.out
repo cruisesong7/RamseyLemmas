@@ -1,0 +1,6 @@
+Task ID: 12
+Job running on: gra84
+CNF file: 3_7_20_43_enc_sortnetwrk.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 03:55:01 PM EDT 2025
+slurmstepd: error: *** JOB 29107634 ON gra84 CANCELLED AT 2025-06-20T21:55:20 DUE TO TIME LIMIT ***

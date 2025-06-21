@@ -1,0 +1,6 @@
+Task ID: 23
+Job running on: gra62
+CNF file: 3_7_21_49_enc_cardnetwrk.cnf
+Solver path: ./cadical/build/cadical
+Start time: Fri Jun 20 03:58:12 PM EDT 2025
+slurmstepd: error: *** JOB 29107671 ON gra62 CANCELLED AT 2025-06-20T21:58:21 DUE TO TIME LIMIT ***
