@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
         print(" ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]), " >= -%d;" % res.e)
     else:
-        f = pysat.card.CardEnc.atmost([eij(e[1], e[0]) for e in itertools.combinations(list(range(res.n)), 2)], bound=res.e)
+        f = pysat.card.CardEnc.atmost([eij(e[1], e[0]) for e in itertools.combinations(list(range(res.n)), 2)], bound=res.e, encoding=res.enc)
 
         f.extend(output_clauses(res.n, res.y, True))
         f.extend(output_clauses(res.n, res.x, False))
