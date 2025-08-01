@@ -58,4 +58,9 @@ lemma toOrderedPair_IsDiag_of_eq {α : Type} [inst : LinearOrder α] : ∀ {s t 
         · simp at sylex sxle ⊢
           apply inst.le_antisymm <;> assumption
 
+lemma isDiag_of_subsingleton {α : Type} [Subsingleton α] : ∀ (s : Sym2 α), s.IsDiag := by
+  intro s
+  induction s with
+  | h x y => simp [eq_iff_true_of_subsingleton]
+
 end Sym2
