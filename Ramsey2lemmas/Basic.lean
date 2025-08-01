@@ -34,11 +34,11 @@ section FintypeVGraph
 variable {V : Type*} (G : SimpleGraph V) (x y : ℕ)
 
 -- TODO: Make this a namespace
-section Iso
+namespace Iso
 
 variable {W : Type*} (G' : SimpleGraph W)
 
-lemma Iso.IsClique (iso : G ≃g G') : G.IsClique s ↔ G'.IsClique (iso.toEquiv '' s) := by
+lemma IsClique (iso : G ≃g G') : G.IsClique s ↔ G'.IsClique (iso.toEquiv '' s) := by
   simp [SimpleGraph.IsClique, Set.Pairwise]
   apply Iff.intro <;> intros sprop u uins v vins uneqv
   · simp [← iso.map_rel_iff'] at sprop
@@ -47,7 +47,7 @@ lemma Iso.IsClique (iso : G ≃g G') : G.IsClique s ↔ G'.IsClique (iso.toEquiv
     simp
     apply sprop <;> assumption
 
-lemma Iso.IsIndepSet (iso : G ≃g G') : G.IsIndepSet s ↔ G'.IsIndepSet (iso.toEquiv '' s) := by
+lemma IsIndepSet (iso : G ≃g G') : G.IsIndepSet s ↔ G'.IsIndepSet (iso.toEquiv '' s) := by
   simp [SimpleGraph.IsIndepSet, Set.Pairwise]
   apply Iff.intro <;> intros sprop u uins v vins uneqv
   · simp [← iso.map_rel_iff'] at sprop
@@ -56,11 +56,11 @@ lemma Iso.IsIndepSet (iso : G ≃g G') : G.IsIndepSet s ↔ G'.IsIndepSet (iso.t
     simp
     apply sprop <;> assumption
 
-lemma Iso.IsNClique (iso : G ≃g G') : G.IsNClique n s ↔ G'.IsNClique n (s.map iso.toEquiv) := by simp [isNClique_iff, iso.IsClique]
+lemma IsNClique (iso : G ≃g G') : G.IsNClique n s ↔ G'.IsNClique n (s.map iso.toEquiv) := by simp [isNClique_iff, iso.IsClique]
 
-lemma Iso.IsNIndepSet (iso : G ≃g G') : G.IsNIndepSet n s ↔ G'.IsNIndepSet n (s.map iso.toEquiv) := by simp [isNIndepSet_iff, iso.IsIndepSet]
+lemma IsNIndepSet (iso : G ≃g G') : G.IsNIndepSet n s ↔ G'.IsNIndepSet n (s.map iso.toEquiv) := by simp [isNIndepSet_iff, iso.IsIndepSet]
 
-lemma Iso.cliqueNum (iso : G ≃g G') : G.cliqueNum = G'.cliqueNum := by
+lemma cliqueNum (iso : G ≃g G') : G.cliqueNum = G'.cliqueNum := by
   unfold SimpleGraph.cliqueNum
   congr
   ext n
@@ -76,7 +76,7 @@ lemma Iso.cliqueNum (iso : G ≃g G') : G.cliqueNum = G'.cliqueNum := by
     use (S'.map iso.toEquiv.symm)
     simpa [iso.IsNClique, Finset.map_map]
 
-lemma Iso.indepNum (iso : G ≃g G') : G.indepNum = G'.indepNum := by
+lemma indepNum (iso : G ≃g G') : G.indepNum = G'.indepNum := by
   unfold SimpleGraph.indepNum
   congr
   ext n
@@ -92,7 +92,7 @@ lemma Iso.indepNum (iso : G ≃g G') : G.indepNum = G'.indepNum := by
     use (S'.map iso.toEquiv.symm)
     simpa [iso.IsNIndepSet, Finset.map_map]
 
-def Iso.compl (iso : G ≃g G') : Gᶜ ≃g G'ᶜ := by
+def compl (iso : G ≃g G') : Gᶜ ≃g G'ᶜ := by
   use iso
   intro u v
   simp [not_iff_not, ← iso.map_rel_iff']
