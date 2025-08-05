@@ -243,8 +243,11 @@ section Nonempty
 
 variable {x y N : ℕ} (G : SimpleGraph (Fin N.succ)) (p : Fin N.succ) [DecidableRel G.Adj]
 
--- NOTE: Probably follows from cliqueNum_mono above
-lemma cliqueNumMono : (H₁ G p).cliqueNum ≤ G.cliqueNum - 1 := by
+-- NOTE: The linter flags [DecidableRel G.Adj] as unused which is
+-- probably wrong because one cannot use H₁ without it.  This only
+-- started appearing after the update to v4.22.0 so probably a
+-- newly-introduced bug.
+lemma H₁_cliqueNum_lt : (H₁ G p).cliqueNum ≤ G.cliqueNum - 1 := by
   simp [Nat.le_iff_lt_add_one, ← Nat.sub_add_comm G.cliqueNum_pos]
   suffices clique_insert : ∀ S n', (G.H₁ p).IsNClique n' S → G.IsNClique n'.succ (insert p (S.map ⟨Subtype.val, by simp⟩)) by
     obtain ⟨S, SIsNClique⟩ := (G.H₁ p).exists_isNClique_cliqueNum
@@ -275,13 +278,13 @@ theorem Lemma₂ : G.isXYGraph x.succ y.succ →  G.degree p ≤ RamseyOld x y.s
   · have H₁isXYGraph: (H₁ G p).isXYGraph x y.succ := by
       simp [isXYGraph] at xyGraphProp ⊢
       simp [← Nat.sub_lt_sub_iff_right (cliqueNum_pos G)] at xyGraphProp
-      refine ⟨Nat.lt_of_le_of_lt (cliqueNumMono _ _) xyGraphProp.left, Nat.lt_of_le_of_lt (Embedding.indepNum_mono (by simp [H₁]; apply Embedding.induce : (G.H₁ p) ↪g G)) xyGraphProp.right⟩
+      refine ⟨Nat.lt_of_le_of_lt (H₁_cliqueNum_lt _ _) xyGraphProp.left, Nat.lt_of_le_of_lt (Embedding.indepNum_mono (by simp [H₁]; apply Embedding.induce : (G.H₁ p) ↪g G)) xyGraphProp.right⟩
     have tmp := (cardLERamseyOld (H₁ G p) x y.succ H₁isXYGraph)
     rw [card_neighborSet_eq_degree] at tmp
     exact tmp
   · have H₁isXYGraph_C : (H₁ Gᶜ p)ᶜ.isXYGraph x.succ y := by
       have indepNum_mono := Embedding.indepNum_mono (by simp [H₁]; apply Embedding.induce : (G.H₁ p) ↪g G)
-      have cliqueNum_mono := cliqueNumMono Gᶜ p
+      have cliqueNum_mono := H₁_cliqueNum_lt Gᶜ p
       simp at indepNum_mono cliqueNum_mono
       rw [Lemma₁] at xyGraphProp ⊢
       simp [isXYGraph] at xyGraphProp ⊢
@@ -810,7 +813,7 @@ theorem Corollary₂ (hxy : G.isXYGraph 3 y.succ) (iub : i ≤ RamseyOld 2 y.suc
       · trivial
       · by_contra
         simp_all
-    have H₁CliqueNum_UB := cliqueNumMono G p
+    have H₁CliqueNum_UB := H₁_cliqueNum_lt G p
     simp [← Nat.sub_lt_sub_iff_right (cliqueNum_pos G)] at hxy
     exact Nat.lt_of_le_of_lt H₁CliqueNum_UB hxy.left
   · have tmp := GraphRamsey2 y
@@ -905,7 +908,7 @@ lemma e₂_ge_e (hxy: G.isXYGraph x.succ y.succ) : G.e₂ p ≥ e x.succ y (N - 
     · have Gcc := H₁₂_iso Gᶜ p
       rw [compl_compl G] at Gcc
       simp [← Gcc.indepNum]
-      have Gccn := Nat.lt_of_le_sub_one (by simp [Nat.lt_iff_add_one_le, G.indepNum_pos]) (Gᶜ.cliqueNumMono p)
+      have Gccn := Nat.lt_of_le_sub_one (by simp [Nat.lt_iff_add_one_le, G.indepNum_pos]) (Gᶜ.H₁_cliqueNum_lt p)
       have Ginle := Nat.le_pred_of_lt hxy.right
       simp [isXYGraph] at hxy Gccn Ginle
       exact Nat.lt_of_lt_of_le Gccn Ginle
