@@ -1,6 +1,6 @@
 import Mathlib.Data.Nat.Basic
 
-import Ramsey2lemmas.Basic
+import Ramsey2lemmas.Theory
 
 @[simp]
 lemma Fin.val_three (n : Nat) : (3 : Fin (n + 4)).val = 3 := rfl
