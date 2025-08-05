@@ -538,25 +538,6 @@ N.succ ≤ RamseyOld x y.succ + RamseyOld x.succ y + 1 - (σ_G hxy) ∧ (σ_G hx
 
 open Finset
 
-lemma pairs_to_degree : ∀ u, #(Finset.image (u, ·) (Finset.filter (G.Adj u ·) Finset.univ)) = G.degree u := by
-  intros u
-  unfold SimpleGraph.degree
-  apply Finset.card_nbij (λ e ↦ e.2)
-  · simp
-  · simp [Set.InjOn]
-  -- NOTE: You would think all of this follows from simps but most any simp here causes maxHeartbeats errors
-  · simp [Set.SurjOn]
-    rw [Set.subset_def]
-    intros v vadj
-    simp at vadj
-    rw [Set.mem_image]
-    use (u, v)
-    rw [Set.mem_image]
-    apply And.intro
-    · use v
-      simpa
-    · trivial
-
 -- TODO: See if this is useable in Prop₂
 lemma vᵢ_deg_swap {x y N : ℕ} {G : SimpleGraph (Fin N.succ)} [DecidableRel G.Adj] (hxy : G.isXYGraph x.succ y.succ) : ∀ (j : Fin N.succ) (d : Fin (σ_G hxy).succ), vᵢ x y (G.degree j) = d.val ↔ G.degree j = vᵢ x y d.val := by
   simp [Fin.ext_iff, vᵢ]
@@ -570,8 +551,6 @@ lemma vᵢ_deg_swap {x y N : ℕ} {G : SimpleGraph (Fin N.succ)} [DecidableRel G
     · rw [← Nat.lt_add_one_iff]
       exact d.prop
     · simp [σ_G]
-
-set_option maxHeartbeats 500000
 
 theorem Prop₂ (hxy : G.isXYGraph x.succ y.succ) (iub : i ≤ RamseyOld x y.succ) (hp: G.degree p = vᵢ x y i) : 2 * (((e₂ G p : ℤ)  - e₁ G p)) =
 RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j ∈ Finset.range (σ_G hxy).succ, j * (2 * (tᵢ G x y j p) - (sᵢ G x y j : ℤ)) := by
@@ -596,7 +575,8 @@ RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j ∈ Fin
         · apply Finset.sum_congr
           · trivial
           · intros u _
-            apply pairs_to_degree
+            unfold SimpleGraph.degree
+            apply Finset.card_nbij (λ e ↦ e.2) <;> simp [Set.InjOn, Set.SurjOn, Set.subset_def]
       apply Finset.card_biUnion
       intros u uadj v vadj uneqv
       intros x xinl xinr
