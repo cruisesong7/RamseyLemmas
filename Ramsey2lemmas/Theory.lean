@@ -970,10 +970,13 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ) : N.succ * G.edgeFinset.card ≥ (�
           | isFalse h2 =>
             simp [Finset.eq_empty_iff_forall_notMem] at h2
             left
-            use e.pmap (λ v (vprop : v ∈ e) ↦ ⟨v, by simp; apply And.intro; intro peqv; simp [← peqv] at vprop; contradiction; intro pv; cases h2 v pv vprop⟩) (by simp)
+            use e.pmap (λ v vprop ↦ ⟨v, by simp; apply And.intro; intro peqv; simp [← peqv] at vprop; contradiction; intro pv; cases h2 v pv vprop⟩) (by simp)
             apply And.intro
             · simp [H₂]
-              sorry
+              cases e with
+              | h u v =>
+                simp [Sym2.pmap_pair] at emem ⊢
+                exact emem
             · simp [revemb]
               ext v
               simp [Sym2.mem_map]
@@ -984,15 +987,14 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ) : N.succ * G.edgeFinset.card ≥ (�
                 contradiction
               · intro pv
                 cases h2 v pv vine
-      · intro exv
-        cases exv with
-        | inl exv =>
-          obtain ⟨v, vprop⟩ := exv
-          simp [H₂, revemb] at vprop
-          rw [v.toOrderedPair_repr] at vprop
-          simp only [SimpleGraph.mem_edgeSet, Sym2.map_pair_eq, SimpleGraph.comap_adj, Function.Embedding.subtype_apply] at vprop
-          simp [← vprop.right]
-          exact vprop.left
+      · intro ex
+        cases ex with
+        | inl exf =>
+          obtain ⟨f, fprop⟩ := exf
+          cases f with
+          | h u v =>
+            simp [SimpleGraph.mem_edgeSet, Sym2.map_pair_eq, SimpleGraph.comap_adj, Function.Embedding.subtype_apply, H₂] at fprop
+            simp [← fprop.right, revemb, fprop.left]
         | inr exv =>
           obtain ⟨v, vprop⟩ := exv
           exact G.incidenceSet_subset v vprop.right
