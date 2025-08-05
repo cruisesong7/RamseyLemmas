@@ -80,34 +80,34 @@ end Iso
 
 section Fintype
 
-lemma fintype_cliqueNum_bddAbove {α : Type} [Fintype α] (G : SimpleGraph α) : BddAbove {n | ∃ s, G.IsNClique n s} := by
+lemma fintype_cliqueNum_bddAbove {α : Type*} [Fintype α] (G : SimpleGraph α) : BddAbove {n | ∃ s, G.IsNClique n s} := by
   use Fintype.card α
   rintro y ⟨s, syc⟩
   rw [← syc.card_eq]
   apply Finset.card_le_univ
 
-lemma fintype_indepNum_bddAbove {α : Type} [Fintype α] (G : SimpleGraph α) : BddAbove {n | ∃ s, G.IsNIndepSet n s} := by
+lemma fintype_indepNum_bddAbove {α : Type*} [Fintype α] (G : SimpleGraph α) : BddAbove {n | ∃ s, G.IsNIndepSet n s} := by
   use Fintype.card α
   rintro y ⟨s, syc⟩
   rw [← syc.card_eq]
   apply Finset.card_le_univ
 
 @[simp]
-lemma cliqueNum_pos {α : Type} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.cliqueNum := by
+lemma cliqueNum_pos {α : Type*} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.cliqueNum := by
   apply le_csSup G.fintype_cliqueNum_bddAbove
   simp
   use { ne.some }
   tauto
 
 @[simp]
-lemma indepNum_pos {α : Type} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.indepNum := by
+lemma indepNum_pos {α : Type*} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.indepNum := by
   apply le_csSup G.fintype_indepNum_bddAbove
   simp
   use { ne.some }
   tauto
 
 @[simp]
-lemma cliqueNum_top {α : Type} [Fintype α] : (⊤ : SimpleGraph α).cliqueNum = Fintype.card α := by
+lemma cliqueNum_top {α : Type*} [Fintype α] : (⊤ : SimpleGraph α).cliqueNum = Fintype.card α := by
   simp [cliqueNum]
   apply IsGreatest.csSup_eq
   apply And.intro
@@ -122,7 +122,7 @@ lemma cliqueNum_top {α : Type} [Fintype α] : (⊤ : SimpleGraph α).cliqueNum 
     apply Finset.card_le_univ
 
 @[simp]
-lemma cliqueNum_bot {α : Type} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).cliqueNum = 1 := by
+lemma cliqueNum_bot {α : Type*} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).cliqueNum = 1 := by
   cases Nat.lt_trichotomy (⊥ : SimpleGraph α).cliqueNum 1 with
   | inl cnlt => cases (Nat.not_lt_of_le (cliqueNum_pos _)) cnlt
   | inr cont =>
@@ -134,12 +134,12 @@ lemma cliqueNum_bot {α : Type} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph 
       cases (cliqueFree_bot cnge2) S SIsNClique
 
 @[simp]
-lemma indepNum_bot {α : Type} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).indepNum = Fintype.card α := by simp [← cliqueNum_compl, cliqueNum_top]
+lemma indepNum_bot {α : Type*} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).indepNum = Fintype.card α := by simp [← cliqueNum_compl, cliqueNum_top]
 
 @[simp]
-lemma indepNum_top {α : Type} [Fintype α] [Nonempty α] : (⊤ : SimpleGraph α).indepNum = 1 := by simp [← cliqueNum_compl, cliqueNum_bot]
+lemma indepNum_top {α : Type*} [Fintype α] [Nonempty α] : (⊤ : SimpleGraph α).indepNum = 1 := by simp [← cliqueNum_compl, cliqueNum_bot]
 
-lemma exists_isNClique_of_le_cliqueNum {α : Type} [Fintype α] {G : SimpleGraph α} {n : ℕ} (h : n ≤ G.cliqueNum) : ∃ S, G.IsNClique n S := by
+lemma exists_isNClique_of_le_cliqueNum {α : Type*} [Fintype α] {G : SimpleGraph α} {n : ℕ} (h : n ≤ G.cliqueNum) : ∃ S, G.IsNClique n S := by
   rcases G.exists_isNClique_cliqueNum with ⟨s, sclique⟩
   have nlescard : n ≤ s.card := by simp [h, sclique.card_eq]
   obtain ⟨t, tprop⟩ := s.exists_subset_card_eq nlescard
@@ -147,7 +147,7 @@ lemma exists_isNClique_of_le_cliqueNum {α : Type} [Fintype α] {G : SimpleGraph
   simp [← tprop.right, isNClique_iff]
   exact sclique.isClique.subset tprop.left
 
-lemma exists_isNIndset_of_le_indepNum {α : Type} [Fintype α] {G : SimpleGraph α} {n : ℕ} (h : n ≤ G.indepNum) : ∃ S, G.IsNIndepSet n S := by
+lemma exists_isNIndset_of_le_indepNum {α : Type*} [Fintype α] {G : SimpleGraph α} {n : ℕ} (h : n ≤ G.indepNum) : ∃ S, G.IsNIndepSet n S := by
   rcases G.exists_isNIndepSet_indepNum with ⟨s, sindset⟩
   have nlescard : n ≤ s.card := by simp [h, sindset.card_eq]
   obtain ⟨t, tprop⟩ := s.exists_subset_card_eq nlescard
@@ -155,7 +155,7 @@ lemma exists_isNIndset_of_le_indepNum {α : Type} [Fintype α] {G : SimpleGraph 
   simp [← tprop.right, isNIndepSet_iff]
   exact sindset.isIndepSet.subset tprop.left
 
-lemma cliqueNum2CliqueFree {α : Type} [Fintype α] (G : SimpleGraph α) : G.cliqueNum < x ↔ G.CliqueFree x := by
+lemma cliqueNum_lt_iff_cliqueFree {α : Type*} [Fintype α] {x : ℕ} (G : SimpleGraph α) : G.cliqueNum < x ↔ G.CliqueFree x := by
   simp [CliqueFree, isNClique_iff]
   apply Iff.intro
   · intros H_cliqueNum S SIsClique Scard

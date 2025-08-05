@@ -70,7 +70,7 @@ lemma isXYGraph_bddAbove : BddAbove {N : ℕ | ∃ (G : SimpleGraph (Fin N)), G.
 
 variable [Fintype V]
 
-lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
+lemma cardLERamseyOld : G.isXYGraph x y → Fintype.card V ≤ RamseyOld x y := by
   cases (Nat.eq_zero_or_pos (Fintype.card V)) with
   | inl Vempty => simp [Vempty]
   | inr Vnonempty =>
@@ -81,6 +81,13 @@ lemma cardLERamseyOld [DecidableEq V] : G.isXYGraph x y → Fintype.card V ≤ R
     · simp [SimpleGraph.isXYGraph] at Gxy ⊢
       use G.overFin rfl
       simpa [← (G.overFinIso rfl).cliqueNum, ← (G.overFinIso rfl).indepNum]
+
+lemma R3y_neighbor_Ind [DecidableEq V] [DecidableRel G.Adj] {y : ℕ} (hxy: G.isXYGraph 3 y.succ) : ∀ p,  G.IsNIndepSet (G.degree p) (G.neighborFinset p) := by
+  intro p
+  simp [G.isNIndepSet_iff, G.neighborFinset_def, SimpleGraph.degree]
+  apply G.isIndepSet_neighborSet_of_triangleFree
+  rw [← G.cliqueNum_lt_iff_cliqueFree]
+  exact hxy.left
 
 ------------------------------------------------ RamseyOld <-> GraphRamsey
 
@@ -236,6 +243,25 @@ def H₁₂_iso : (G.H₁ p)ᶜ ≃g (Gᶜ.H₂ p) := {
   right_inv := by simp [Function.RightInverse, Function.LeftInverse],
   map_rel_iff' := by simp [H₁, H₂]
 }
+
+-- NOTE: The linter flags [DecidableRel G.Adj] as unused which is
+-- probably wrong because one cannot use H₁ without it.  This only
+-- started appearing after the update to v4.22.0 so probably a
+-- newly-introduced bug.
+lemma H₁_eq_bot_of_3y (hxy : G.isXYGraph 3 y.succ) : ∀ p, G.H₁ p = ⊥ := by
+  simp [← SimpleGraph.edgeSet_eq_empty, Set.eq_empty_iff_forall_notMem, H₁]
+  intros p e eind
+  cases e with
+  | h u v =>
+    simp at eind
+    change G.Adj ↑u ↑v at eind
+    have pu := u.prop
+    have pv := v.prop
+    simp [-Subtype.coe_prop] at pu pv
+    have clique3 : G.IsNClique 3 {p, ↑u, ↑v} := by simp [G.is3Clique_triple_iff]; tauto
+    have cnle3 := clique3.isClique.card_le_cliqueNum
+    rw [clique3.card_eq] at cnle3
+    cases (Nat.not_le_of_lt hxy.left) cnle3
 
 end Induced
 
@@ -792,33 +818,10 @@ RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j ∈ Fin
             simp [uprop.right, vprop.right] at padj
         next => aesop
 
-theorem Corollary₂ (hxy : G.isXYGraph 3 y.succ) (iub : i ≤ RamseyOld 2 y.succ) (hp: G.degree p = vᵢ 2 y i) :
-  2 * e₂ G p = ↑y * ((↑N.succ) - 2 * ↑y + 2 * ↑i) + ∑ j ∈ Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑ (tᵢ G 2 y j p) - ↑(sᵢ G 2 y j)) := by
+theorem Corollary₂ (hxy : G.isXYGraph 3 y.succ) (iub : i ≤ RamseyOld 2 y.succ) (hp: G.degree p = vᵢ 2 y i) : 2 * e₂ G p = ↑y * ((↑N.succ) - 2 * ↑y + 2 * ↑i) + ∑ j ∈ Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑ (tᵢ G 2 y j p) - ↑(sᵢ G 2 y j)) := by
   have Prop₂ := Prop₂ i p hxy iub hp
-  suffices tmp: G.e₁ p = 0 ∧ RamseyOld 2 y.succ = y by
-    rw [tmp.left, tmp.right] at Prop₂
-    simp_all
-  apply And.intro
-  · simp [Finset.filter_eq_empty_iff]
-    by_contra H
-    simp at H
-    obtain ⟨⟨u, v⟩, uvProp⟩ := H
-    simp [isXYGraph] at hxy
-    suffices (G.H₁ p).cliqueNum < 2 by
-      simp [cliqueNum2CliqueFree, CliqueFree, isNClique_iff] at this
-      have contra := this {u,v}
-      simp [IsClique] at contra uvProp
-      simp [uvProp] at contra
-      rw [Finset.card_insert_of_notMem] at contra
-      · trivial
-      · by_contra
-        simp_all
-    have H₁CliqueNum_UB := H₁_cliqueNum_lt G p
-    simp [← Nat.sub_lt_sub_iff_right (cliqueNum_pos G)] at hxy
-    exact Nat.lt_of_le_of_lt H₁CliqueNum_UB hxy.left
-  · have tmp := GraphRamsey2 y
-    simp [GraphRamsey2RamseyOld] at tmp
-    exact tmp
+  simp [-Set.toFinset_card, RamseyOld₂] at Prop₂ ⊢
+  simp +arith [← Prop₂, Finset.filter_eq_empty_iff, G.H₁_eq_bot_of_3y hxy]
 
 -- theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (vᵢ 3 y i) ∧ G.degree v = (vᵢ 3 y i)):
 --   let p := Exists.choose h -- use classical.choose, is this bad?
@@ -1056,10 +1059,7 @@ theorem Prop₄ (hxy: G.isXYGraph 3 y.succ) : N.succ * G.edgeFinset.card ≥ (�
     · simp [Set.PairwiseDisjoint, Set.Pairwise, Finset.disjoint_iff_inter_eq_empty, Finset.eq_empty_iff_forall_notMem]
       intros u pu v pv uneqp e eincu eincv
       have uv := G.adj_of_mem_incidenceSet uneqp eincu eincv
-      have clique3 : G.IsNClique 3 {p, u, v} := by simp [G.is3Clique_triple_iff]; tauto
-      have cnle3 := clique3.isClique.card_le_cliqueNum
-      rw [clique3.card_eq] at cnle3
-      cases (Nat.not_le_of_lt hxy.left) cnle3
+      cases (G.R3y_neighbor_Ind hxy p).isIndepSet (by simpa) (by simpa) uneqp uv
   have ele : ∀ p ∈ (@Finset.univ (Fin N.succ) _), e 3 y (N - G.degree p).pred + vᵢ 2 y (y - G.degree p) ^ 2 + (y - G.degree p) * ∑ j : Fin (σ_G hxy).succ, β p ↑j ≤ #G.edgeFinset + ∑ j : Fin (σ_G hxy).succ, ↑j * β p ↑j := by
     intro p _
     have pdegle := (Lemma₂ G p hxy).left
