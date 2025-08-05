@@ -241,53 +241,6 @@ end Induced
 
 section Nonempty
 
-@[simp]
-lemma cliqueNum_pos {α : Type} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.cliqueNum := by
-  apply le_csSup G.fintype_cliqueNum_bddAbove
-  simp
-  use { ne.some }
-  tauto
-
-@[simp]
-lemma indepNum_pos {α : Type} [Fintype α] [ne : Nonempty α] (G : SimpleGraph α) : 1 ≤ G.indepNum := by
-  apply le_csSup G.fintype_indepNum_bddAbove
-  simp
-  use { ne.some }
-  tauto
-
-@[simp]
-lemma cliqueNum_top {α : Type} [Fintype α] : (⊤ : SimpleGraph α).cliqueNum = Fintype.card α := by
-  simp [cliqueNum]
-  apply IsGreatest.csSup_eq
-  apply And.intro
-  · simp
-    use Finset.univ
-    constructor
-    · simp [isClique_iff, Set.Pairwise]
-    · simp
-  · simp [upperBounds]
-    rintro s S ⟨SClique, Scard⟩
-    simp [← Scard]
-    apply Finset.card_le_univ
-
-@[simp]
-lemma cliqueNum_bot {α : Type} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).cliqueNum = 1 := by
-  cases Nat.lt_trichotomy (⊥ : SimpleGraph α).cliqueNum 1 with
-  | inl cnlt => cases (Nat.not_lt_of_le (cliqueNum_pos _)) cnlt
-  | inr cont =>
-    cases cont with
-    | inl _ => assumption
-    | inr cnge2 =>
-      simp [← Nat.add_one_le_iff] at cnge2
-      obtain ⟨S, SIsNClique⟩ := (⊥ : SimpleGraph α).exists_isNClique_cliqueNum
-      cases (cliqueFree_bot cnge2) S SIsNClique
-
-@[simp]
-lemma indepNum_bot {α : Type} [Fintype α] [Nonempty α] : (⊥ : SimpleGraph α).indepNum = Fintype.card α := by simp [← cliqueNum_compl, cliqueNum_top]
-
-@[simp]
-lemma indepNum_top {α : Type} [Fintype α] [Nonempty α] : (⊤ : SimpleGraph α).indepNum = 1 := by simp [← cliqueNum_compl, cliqueNum_bot]
-
 variable {x y N : ℕ} (G : SimpleGraph (Fin N.succ)) (p : Fin N.succ) [DecidableRel G.Adj]
 
 -- NOTE: Probably follows from cliqueNum_mono above
