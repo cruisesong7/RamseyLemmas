@@ -48,6 +48,13 @@ lemma e37_19 : e 3 7 19 ≥ 44 := by sorry
 lemma e37_20 : e 3 7 20 ≥ 50 := by sorry
 lemma e37_21 : e 3 7 21 ≥ 59 := by sorry
 
+lemma R38lb : 27 ∈ {N | ∃ G : SimpleGraph (Fin N), G.isXYGraph 3 8} := by
+  let G := readG6 "Z????CDO?a@PHA_HcE_dc`PCXQ@PoSWo@_cDS_YQQB_Qo?TLSO?q_g?{p?_?"
+  use G
+  unfold SimpleGraph.isXYGraph
+  rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
+  native_decide
+
 theorem Ineq₉: e 3 8 26 ≥ 80 := by
   simp only [e]
   apply le_csInf
@@ -85,146 +92,132 @@ theorem Ineq₉: e 3 8 26 ≥ 80 := by
     simp at h1 h2 h3 ⊢
     nlinarith [e37_18, e37_19, e37_20, e37_21]
 
-lemma Ineq₁₀_helper {G : SimpleGraph (Fin 28)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8) : G.edgeFinset.card ≥ 88 := by
+theorem Ineq₁₀ (h : RamseyOld 3 8 > 27):
+e 3 8 27 ≥ 88 := by
+  simp only [e]
+  apply le_csInf
+  norm_num [RamseyOld] at h
+  rw [lt_csSup_iff] at h
+  obtain ⟨n,⟨G,hG⟩ , hn⟩ := h
+  sorry  --TODO: let G' be the subgraph of G with order 28, if G is XYGraph then G' also is
+  apply isXYGraph_bddAbove
+  use 27
+  apply R38lb
+  · simp [-Set.toFinset_card]
+    intros _ G GisXY _ cardeqe
+    rw [← cardeqe]
+    have h1 := Prop₄ GisXY
+    simp [-Set.toFinset_card] at h1
+    have σub : σ_G GisXY < 3 := by
+      simp +arith [σ_G, RamseyOld₂]
+      obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
+      have := (Lemma₂ G v GisXY).right
+      simp +arith [R37, ← vmindeg] at this
+      assumption
+    have h2 := G_degreeCount_eq G GisXY
+    have h3 := G_vertCount_eq G GisXY
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (27 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    simp at bilinearlb vertexlb degreelb
+    -- NOTE: Using simp here maxes out hearbeats
+    simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂ 7] at h1
+    simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂] at h2
+    simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_three] at h3
+    simp at h1 h2 h3 ⊢
+    nlinarith [e37_19, e37_20, e37_21]
+
+theorem Ineq₁₁ (h : RamseyOld 3 8 > 28):
+e 3 8 28 ≥ 99 := by
+  simp only [e]
+  apply le_csInf
+  norm_num [RamseyOld] at h
+  rw [lt_csSup_iff] at h
+  obtain ⟨n,⟨G,hG⟩ , hn⟩ := h
+  sorry  --TODO: let G' be the subgraph of G with order 29, if G is XYGraph then G' also is
+  apply isXYGraph_bddAbove
+  use 27
+  apply R38lb
+  · simp [-Set.toFinset_card]
+    intros _ G GisXY _ cardeqe
+    rw [← cardeqe]
+    have h1 := Prop₄ GisXY
+    simp [-Set.toFinset_card] at h1
+    have σub : σ_G GisXY < 2 := by
+      simp +arith [σ_G, RamseyOld₂]
+      obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
+      have := (Lemma₂ G v GisXY).right
+      simp +arith [R37, ← vmindeg] at this
+      assumption
+    have h2 := G_degreeCount_eq G GisXY
+    have h3 := G_vertCount_eq G GisXY
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (28 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    simp at bilinearlb vertexlb degreelb
+    -- NOTE: Using simp here maxes out hearbeats
+    simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂ 7] at h1
+    simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂] at h2
+    simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_two] at h3
+    simp at h1 h2 h3 ⊢
+    nlinarith [e37_20, e37_21]
+
+theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
+G.edgeFinset.card ≥ 144 := by
+  have R28 := RamseyOld₂ 8
+
+  have σub := (Prop₁ hxy).2
+  simp [R28] at σub
+
   have h1 := Prop₄ hxy
   simp [-Set.toFinset_card] at h1
-  have σub : σ_G hxy < 3 := by
-    simp +arith [σ_G, RamseyOld₂]
-    obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
-    have := (Lemma₂ G v hxy).right
-    simp +arith [R37, ← vmindeg] at this
-    assumption
+
   have h2 := G_degreeCount_eq G hxy
   have h3 := G_vertCount_eq G hxy
-  have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 7 (27 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R37])
-  have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R37])
-  have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R37])
-  simp at bilinearlb vertexlb degreelb
-  -- NOTE: Using simp here maxes out hearbeats
-  simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂ 7] at h1
-  simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂] at h2
-  simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_three] at h3
-  simp at h1 h2 h3 ⊢
-  nlinarith [e37_19, e37_20, e37_21]
 
--- theorem Ineq₁₀:
--- e 3 8 27 ≥ 88 := by
---   simp only [e]
---   sorry
---   -- apply le_csInf
---   -- simp [Set.Nonempty, -Set.toFinset_card]
---   -- sorry
---   -- simp [-Set.toFinset_card]
---   -- intro N G hxy _ hn
---   -- have := Ineq₉_helper hxy h1 h2 h3 h4
---   -- omega
+  have R38ub : RamseyOld 3 8 ≤ 29 := by
+    sorry --TODO: either use UNSAT proof or try formalize the informal argument on pp.154
+  have R38lb : RamseyOld 3 8 ≥ 27 := by
+    simp[RamseyOld]
+    apply le_csSup
+    apply isXYGraph_bddAbove
+    apply R38lb
 
-lemma Ineq₁₁_helper {G : SimpleGraph (Fin 29)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 8) : G.edgeFinset.card ≥ 99 := by
-  have h1 := Prop₄ hxy
-  simp [-Set.toFinset_card] at h1
-  have σub : σ_G hxy < 2 := by
-    simp +arith [σ_G, RamseyOld₂]
-    obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
-    have := (Lemma₂ G v hxy).right
-    simp +arith [R37, ← vmindeg] at this
-    assumption
-  have h2 := G_degreeCount_eq G hxy
-  have h3 := G_vertCount_eq G hxy
-  have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 7 (28 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R37])
-  have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R37])
-  have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R37])
-  simp at bilinearlb vertexlb degreelb
-  -- NOTE: Using simp here maxes out hearbeats
-  simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂ 7] at h1
-  simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂] at h2
-  simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_two] at h3
-  simp at h1 h2 h3 ⊢
-  nlinarith [e37_20, e37_21]
+  interval_cases R38 : (RamseyOld 3 8)
 
--- theorem Ineq₁₁:
--- e 3 8 28 ≥ 99 := by
---   simp only [e]
---   sorry
-
--- theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
--- G.edgeFinset.card ≥ 144 := by
---   have hr := RamseyOld₂ 8
-
---   have h1 := Prop₄ 8 hxy
---   simp [-Set.toFinset_card] at h1
---   replace : σ_G hxy ≤ 2 := by
---     have := (Prop₁ hxy).2
---     simp [hr] at this
---     have : RamseyOld 3 8 ≤ 29 := by
---       simp [RamseyOld]
---       apply csSup_le
---       sorry
---       simp
---       intro N G hxy
---       sorry
---     omega
-
---   have h2 := G_degreeCount_eq G hxy
---   have h3 := G_vertCount_eq G hxy
---   have _ := Ineq₉
---   have _ := Ineq₁₀
---   have _ := Ineq₁₁
-
---   interval_cases σ_G hxy
---   · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
---     replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ):= by
---       suffices (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 144 * ↑(G.sᵢ 2 8 0) by
---         linarith
---       gcongr
---       linarith
-
---     replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) := by
---       simp at h2
---       rw [← sum_degrees_eq_twice_card_edges, h2]
---       simp[vᵢ, hr]
---       omega
-
---     replace h3 : ↑(G.sᵢ 2 8 0) = 36 := by
---       simp[this, Finset.range] at h3
---       linarith
---     linarith
-
---   · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
---     replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1):= by
---       suffices (↑(e 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) + (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0) ≥ 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0)by
---         linarith
---       gcongr <;>linarith
-
---     replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) := by
---       simp at h2
---       rw [← sum_degrees_eq_twice_card_edges, h2]
---       simp[Finset.range, vᵢ, hr]
---       omega
-
---     replace h3 : ↑(G.sᵢ 2 8 1) + ↑(G.sᵢ 2 8 0) = 36 := by
---       simp[this, Finset.range] at h3
---       linarith
---     linarith
-
---   · simp [vᵢ, hr, Finset.range, -Set.toFinset_card] at h1
---     replace h1 : 36 * G.edgeFinset.card ≥ 144 * (↑(G.sᵢ 2 8 0) : ℤ ) + 137 * ↑(G.sᵢ 2 8 1) + 135 * ↑(G.sᵢ 2 8 2):= by
---       suffices (↑(e 3 8 28) + 36) * ↑(G.sᵢ 2 8 2) +
---       (↑(e 3 8 27) + 49) * ↑(G.sᵢ 2 8 1) +
---        (↑(e 3 8 26) + 64) * ↑(G.sᵢ 2 8 0)
---        ≥  135 * ↑(G.sᵢ 2 8 2) + 137 * ↑(G.sᵢ 2 8 1) + 144 * ↑(G.sᵢ 2 8 0) by
---         linarith
---       gcongr <;>linarith
-
---     replace h2 : 2 * G.edgeFinset.card = 8 * ↑(G.sᵢ 2 8 0) +  7 * ↑(G.sᵢ 2 8 1) + 6 * ↑(G.sᵢ 2 8 2):= by
---       simp at h2
---       rw [← sum_degrees_eq_twice_card_edges, h2]
---       simp[Finset.range, vᵢ, hr]
---       omega
-
---     replace h3 : ↑(G.sᵢ 2 8 2) + ↑(G.sᵢ 2 8 1) + ↑(G.sᵢ 2 8 0)  = 36 := by
---       simp[this, Finset.range] at h3
---       linarith
---     linarith
+  · norm_num at σub
+    norm_num [σub, R28, Finset.range, -Set.toFinset_card] at h1 h2 h3
+    have _ := Ineq₉
+    nlinarith
+  · norm_num at σub
+    have _ := Ineq₉
+    have _ := Ineq₁₀ (show RamseyOld 3 8 > 27 by linarith)
+    replace σub := Nat.lt_succ_of_le σub
+    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    simp at bilinearlb vertexlb degreelb
+    -- NOTE: Using simp here maxes out hearbeats
+    simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_two, vᵢ, R28] at h1
+    simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_two, vᵢ, R28] at h2
+    simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_two] at h3
+    simp at h1 h2 h3 ⊢
+    nlinarith
+  · norm_num at σub
+    have _ := Ineq₉
+    have _ := Ineq₁₀ (show RamseyOld 3 8 > 27 by linarith)
+    have _ := Ineq₁₁ (show RamseyOld 3 8 > 28 by linarith)
+    replace σub := Nat.lt_succ_of_le σub
+    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    simp at bilinearlb vertexlb degreelb
+    -- NOTE: Using simp here maxes out hearbeats
+    simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, R28] at h1
+    simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_three, vᵢ, R28] at h2
+    simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_three] at h3
+    simp at h1 h2 h3 ⊢
+    nlinarith
 
 -- theorem R39_36_graph_IsRegular8 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
 --   G.IsRegularOfDegree 8 := by
