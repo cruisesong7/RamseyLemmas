@@ -41,7 +41,8 @@ lemma sᵢ_vanish {N x y : ℕ} {G : SimpleGraph (Fin N.succ)} [DecidableRel G.A
     simp [Nat.sub_eq_iff_eq_add (Nat.le_of_lt vdegpos)] at vdeg
     simp [vdeg, Nat.add_one_le_iff, Nat.sub_add_comm (G.minDegree_le_degree v), RamseyOld₂] at σltd
 
-theorem R37 : RamseyOld 3 7 = 22 := sorry
+theorem R36 : RamseyOld 3 6 = 17 := sorry --TODO: computation K or R (the upperbound is exact so we should prove the exact values)
+theorem R37 : RamseyOld 3 7 = 22 := sorry --TODO: computation O
 
 lemma e37_18 : e 3 7 18 ≥ 36 := by sorry
 lemma e37_19 : e 3 7 19 ≥ 44 := by sorry
@@ -54,6 +55,40 @@ lemma R38lb : 27 ∈ {N | ∃ G : SimpleGraph (Fin N), G.isXYGraph 3 8} := by
   unfold SimpleGraph.isXYGraph
   rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
   native_decide
+
+theorem Ineq₁ : e 3 6 11 ≥ 11 := sorry --TODO: the proof start in pp.163 Appendix B
+theorem Ineq₂ : e 3 6 12 ≥ 15 := sorry
+theorem Ineq₃ : e 3 6 13 ≥ 20 := sorry
+theorem Ineq₄ : e 3 6 14 ≥ 25 := sorry
+theorem Ineq₄': e 3 6 15 ≥ 32 := sorry --TODO: computation M
+theorem Ineq₄'':e 3 6 16 ≥ 40 := sorry --TODO: computation L
+theorem Ineq₅ : e 3 7 18 ≥ 36 := by
+  simp only [e]
+  apply le_csInf
+  · sorry --TODO: provide witness
+  · simp [-Set.toFinset_card]
+    intros _ G GisXY _ cardeqe
+    rw [← cardeqe]
+    have h1 := Prop₄ GisXY
+    simp [-Set.toFinset_card] at h1
+    have σub : σ_G GisXY < 6 := by
+      simp +arith [σ_G, RamseyOld₂]
+      obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
+      have := (Lemma₂ G v GisXY).right
+      simp +arith [R36, ← vmindeg] at this
+      assumption
+    have h2 := G_degreeCount_eq G GisXY
+    have h3 := G_vertCount_eq G GisXY
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (18 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp[R36])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
+    simp at bilinearlb vertexlb degreelb
+    -- NOTE: Using simp here maxes out hearbeats
+    simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_six, vᵢ, RamseyOld₂ 6] at h1
+    simp_rw [Nat.mul_comm, degreelb, G.sum_degrees_eq_twice_card_edges, Finset.sum_range, Fin.sum_univ_six, vᵢ, RamseyOld₂] at h2
+    simp_rw [vertexlb, Finset.sum_range, Fin.sum_univ_six] at h3
+    simp at h1 h2 h3 ⊢
+    nlinarith [Ineq₁, Ineq₂, Ineq₃, Ineq₄, Ineq₄', Ineq₄'']
 
 theorem Ineq₉: e 3 8 26 ≥ 80 := by
   simp only [e]
@@ -81,9 +116,9 @@ theorem Ineq₉: e 3 8 26 ≥ 80 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (26 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R37])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R37])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R37])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (26 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_four, vᵢ, RamseyOld₂ 7] at h1
@@ -147,8 +182,9 @@ e 3 8 28 ≥ 99 := by
       simp +arith [σ_G, RamseyOld₂]
       obtain ⟨v, vmindeg⟩ := G.exists_minimal_degree_vertex
       have := (Lemma₂ G v GisXY).right
-      simp +arith [R37, ← vmindeg] at this
-      assumption
+      simp +arith [← vmindeg] at this
+      have := R37
+      omega
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
     have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (28 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
