@@ -3,6 +3,7 @@ import pysat.card
 import itertools
 import argparse
 import sys
+import networkx
 
 def eij(i, j):
     assert(i > j)
@@ -11,7 +12,7 @@ def eij(i, j):
 
 def output_clauses(n, k, pol):
     clauses = []
-    
+
     for c in itertools.combinations(list(range(n)), k):
         clauses.append([(1 if pol else -1) * eij(e[1], e[0]) for e in itertools.combinations(c, 2)])
 
@@ -25,14 +26,15 @@ if __name__ == "__main__":
     a.add_argument("x", type=int, help="Avoid cliques of order x")
     a.add_argument("y", type=int, help="Avoid independent sets of order y")
     a.add_argument("n", type=int, help="Order of the graph")
-    a.add_argument("e", type=int, help="Upper-bound on the size of the graph")
+    a.add_argument("-e", type=int, help="Upper-bound on the size of the graph")
+    a.add_argument("-s", "--solve", default=False, action="store_true", help="Solve the CNF formula and output a g6 graph")
 
     res = a.parse_args()
-    
+
     if res.pb:
         pos_clauses = output_clauses(res.n, res.y, True)
         neg_clauses = output_clauses(res.n, res.x, True)
-        
+
         print("* #variable= %d #constraint= %d" % (res.n * (res.n - 1) // 2, len(pos_clauses) + len(neg_clauses) + 1))
 
         for c in pos_clauses:
@@ -41,27 +43,32 @@ if __name__ == "__main__":
         for c in neg_clauses:
             print(" ".join(["+1 ~x%d" % l for l in c]), ">= 1;")
 
-        print(" ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]), " >= -%d;" % res.e)
+        if res.e is not None:
+            print(" ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]), " >= -%d;" % res.e)
     else:
-        f = pysat.card.CardEnc.atmost([eij(e[1], e[0]) for e in itertools.combinations(list(range(res.n)), 2)], bound=res.e, encoding=res.enc)
-
+        f = pysat.card.CardEnc.atmost([eij(e[1], e[0]) for e in itertools.combinations(list(range(res.n)), 2)], bound=res.e, encoding=res.enc) if res.e is not None else pysat.formula.CNF()
         f.extend(output_clauses(res.n, res.y, True))
         f.extend(output_clauses(res.n, res.x, False))
 
-        # You may ask "why not just print f.to_dimacs()?". Don't.
-        print("p cnf", f.nv, len(f.clauses))
+        if res.solve:
+            s = pysat.solvers.Solver(bootstrap_with=f.clauses)
 
-        for c in f.clauses:
-            print(" ".join([str(l) for l in c]), "0")
+            if s.solve():
+                m = s.get_model()
+                g = networkx.Graph()
 
-        # print ("p cnf", res.n * (res.n - 1) // 2, len(pos_clauses) + len(neg_clauses))
+                g.add_nodes_from(list(range(res.n)))
 
-        # s = pysat.solvers.Solver(bootstrap_with=pos_clauses + neg_clauses)
-        # b = res.n * (res.n - 1) // 2
+                for i in range(res.n):
+                    for j in range(i):
+                        if m[eij(i, j) - 1] > 0:
+                           g.add_edge(i, j)
 
-        # for m in s.enum_models():
-        #     newb = len([l for l in m if l > 0])
+                sys.stdout.write(networkx.readwrite.graph6.to_graph6_bytes(g).decode("ascii"))
+        else:
+            # You may ask "why not just print f.to_dimacs()?". Don't.
+            print("p cnf", f.nv, len(f.clauses))
 
-        #     if newb < b:
-        #         b = newb
-        #         print("b = ", b)
+            for c in f.clauses:
+                print(" ".join([str(l) for l in c]), "0")
+

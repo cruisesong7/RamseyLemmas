@@ -62,10 +62,20 @@ theorem Ineq₃ : e 3 6 13 ≥ 20 := sorry
 theorem Ineq₄ : e 3 6 14 ≥ 25 := sorry
 theorem Ineq₄': e 3 6 15 ≥ 32 := sorry --TODO: computation M
 theorem Ineq₄'':e 3 6 16 ≥ 40 := sorry --TODO: computation L
+
 theorem Ineq₅ : e 3 7 18 ≥ 36 := by
   simp only [e]
   apply le_csInf
-  · sorry --TODO: provide witness
+  · let G := readG6 "R`OCC?hXRABgOh_AbWGOah??S_?KO_"
+    use G.edgeFinset.card
+    simp
+    use G
+    apply And.intro
+    · unfold SimpleGraph.isXYGraph
+      rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
+      native_decide
+    · use (by infer_instance)
+      simp [readG6Header]
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
