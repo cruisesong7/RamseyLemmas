@@ -51,7 +51,6 @@ theorem e3_6_14_25 : e 3 6 14 ≥ 25 := sorry
 theorem e3_6_15_32 : e 3 6 15 ≥ 32 := sorry --TODO: computation M
 theorem e3_6_16_40 : e 3 6 16 ≥ 40 := sorry --TODO: computation L
 
-lemma e3_7_18_36 : e 3 7 18 ≥ 36 := by sorry
 lemma e3_7_19_44 : e 3 7 19 ≥ 44 := by sorry
 lemma e3_7_20_50 : e 3 7 20 ≥ 50 := by sorry
 lemma e3_7_21_59 : e 3 7 21 ≥ 59 := by sorry
@@ -63,7 +62,7 @@ lemma R38lb : 27 ∈ {N | ∃ G : SimpleGraph (Fin N), G.isXYGraph 3 8} := by
   rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
   native_decide
 
-theorem Ineq₅ : e 3 7 18 ≥ 36 := by
+lemma e3_7_18_36 : e 3 7 18 ≥ 36 := by
   simp only [e]
   apply le_csInf
   · let G := readG6 "R`OCC?hXRABgOh_AbWGOah??S_?KO_"
@@ -137,17 +136,41 @@ theorem Ineq₉: e 3 8 26 ≥ 80 := by
     simp at h1 h2 h3 ⊢
     nlinarith [e3_7_18_36, e3_7_19_44, e3_7_20_50, e3_7_21_59]
 
-theorem Ineq₁₀ (h : RamseyOld 3 8 > 27):
-e 3 8 27 ≥ 88 := by
-  simp only [e]
+theorem Ineq₁₀ (h : RamseyOld 3 8 > 27) : e 3 8 27 ≥ 88 := by
+  simp [e]
   apply le_csInf
-  norm_num [RamseyOld] at h
-  rw [lt_csSup_iff] at h
-  obtain ⟨n,⟨G,hG⟩ , hn⟩ := h
-  sorry  --TODO: let G' be the subgraph of G with order 28, if G is XYGraph then G' also is
-  apply isXYGraph_bddAbove
-  use 27
-  apply R38lb
+  · simp only [gt_iff_lt, RamseyOld] at h
+    rw [lt_csSup_iff] at h
+    · obtain ⟨n, ⟨G, Gdec, hG⟩, hn⟩ := h
+      rw [Nat.lt_iff_add_one_le, ← Fintype.card_fin n, Fintype.card, Finset.le_card_iff_exists_subset_card] at hn
+      obtain ⟨V, ⟨Vsub, Vcard⟩⟩ := hn
+      use (G.induce V).edgeFinset.card
+      simp [-Set.toFinset_card] at Vcard ⊢
+      rw [← @Fintype.card_ofFinset (Fin n) V.toSet V (by simp)] at Vcard
+      use (G.induce V).overFin Vcard
+      apply And.intro
+      · simp [SimpleGraph.isXYGraph] at hG ⊢
+        apply And.intro
+        · apply Nat.lt_of_le_of_lt _ hG.left
+          -- TODO Is there a way to make these parameters automatic?
+          rw [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).cliqueNum]
+          exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).cliqueNum_mono
+        · apply Nat.lt_of_le_of_lt _ hG.right
+          rw [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).indepNum]
+          exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).indepNum_mono
+      · use (by intros u v; simp [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).symm.map_adj_iff]; apply Gdec)
+        simp [-Set.toFinset_card]
+        haveI : DecidableRel ((G.induce V).overFin Vcard).Adj := by
+          intros u v
+          simp [SimpleGraph.overFin]
+          apply Gdec
+        simp [← @SimpleGraph.Iso.card_edgeFinset_eq (Fin 28) ((G.induce V).overFin Vcard) ↑V (G.induce V) (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).symm _ _]
+        congr
+    · simp
+      apply isXYGraph_bddAbove
+    · simp
+      use 27
+      apply R38lb
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
