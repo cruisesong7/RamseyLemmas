@@ -330,13 +330,38 @@ theorem Ineq₁₁ (h : RamseyOld 3 8 > 28):
 e 3 8 28 ≥ 99 := by
   simp only [e]
   apply le_csInf
-  norm_num [RamseyOld] at h
-  rw [lt_csSup_iff] at h
-  obtain ⟨n,⟨G,hG⟩ , hn⟩ := h
-  sorry  --TODO: let G' be the subgraph of G with order 29, if G is XYGraph then G' also is
-  apply isXYGraph_bddAbove
-  use 27
-  apply R38lb
+  · simp only [gt_iff_lt, RamseyOld] at h
+    rw [lt_csSup_iff] at h
+    · obtain ⟨n, ⟨G, Gdec, hG⟩, hn⟩ := h
+      rw [Nat.lt_iff_add_one_le, ← Fintype.card_fin n, Fintype.card, Finset.le_card_iff_exists_subset_card] at hn
+      obtain ⟨V, ⟨Vsub, Vcard⟩⟩ := hn
+      use (G.induce V).edgeFinset.card
+      simp [-Set.toFinset_card] at Vcard ⊢
+      rw [← @Fintype.card_ofFinset (Fin n) V.toSet V (by simp)] at Vcard
+      use (G.induce V).overFin Vcard
+      apply And.intro
+      · simp [SimpleGraph.isXYGraph] at hG ⊢
+        apply And.intro
+        · apply Nat.lt_of_le_of_lt _ hG.left
+          -- TODO Is there a way to make these parameters automatic?
+          rw [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).cliqueNum]
+          exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).cliqueNum_mono
+        · apply Nat.lt_of_le_of_lt _ hG.right
+          rw [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).indepNum]
+          exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).indepNum_mono
+      · use (by intros u v; simp [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).symm.map_adj_iff]; apply Gdec)
+        simp [-Set.toFinset_card]
+        haveI : DecidableRel ((G.induce V).overFin Vcard).Adj := by
+          intros u v
+          simp [SimpleGraph.overFin]
+          apply Gdec
+        simp [← @SimpleGraph.Iso.card_edgeFinset_eq (Fin 29) ((G.induce V).overFin Vcard) ↑V (G.induce V) (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).symm _ _]
+        congr
+    · simp
+      apply isXYGraph_bddAbove
+    · simp
+      use 27
+      apply R38lb
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
