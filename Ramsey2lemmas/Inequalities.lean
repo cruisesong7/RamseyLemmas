@@ -449,16 +449,13 @@ theorem R39_36_graph_IsRegular8 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] 
     specialize h_neighbor p
     linarith [hy h_neighbor]
 
-  have _ := R39Ineq hxy
-  have h1 : 2 * 144 ≤ 2 * G.edgeFinset.card := by linarith
-  rw[← sum_degrees_eq_twice_card_edges] at h1
-  norm_num at h1
+  have h1 := Nat.mul_le_mul_left 2 (R39Ineq hxy)
   have h2 : ∑ v : Fin 36, G.degree v ≤ ∑ p : Fin 36, 8 := by
     apply Finset.sum_le_sum
     exact deg_le
-
-  have sum_deg_eq : ∑ v : Fin 36, G.degree v = ∑ p : Fin 36, 8 := by norm_num at *; linarith
-  have := (Finset.sum_eq_sum_iff_of_le deg_le).mp sum_deg_eq
+  simp +arith [-Set.toFinset_card, ← sum_degrees_eq_twice_card_edges] at h1 h2
+  have sum_deg_eq := Nat.le_antisymm h1 h2
+  have := (Finset.sum_eq_sum_iff_of_le deg_le).mp sum_deg_eq.symm
   simp at this
   exact this
 
