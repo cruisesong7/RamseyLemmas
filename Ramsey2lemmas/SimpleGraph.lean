@@ -3,6 +3,14 @@ import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 
 namespace SimpleGraph
 
+-- NOTE: Missing in Mathlib?
+@[simp]
+lemma induce_compl : ∀ f, (induce f G)ᶜ = induce f Gᶜ := by 
+  intro f
+  simp [induce]
+  ext u v
+  simp [Subtype.ext_iff]
+
 -- NOTE: Missing in Mathlib
 theorem IsIndepSet.subset {G : SimpleGraph V} (h : t ⊆ s) : G.IsIndepSet s → G.IsIndepSet t := Set.Pairwise.mono h
 

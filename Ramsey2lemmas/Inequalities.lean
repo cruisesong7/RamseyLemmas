@@ -462,20 +462,23 @@ theorem R39_36_graph_IsRegular8 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] 
   simp at this
   exact this
 
-theorem R39_36_graph_has_R38_27 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9):
- ∃ (s : Finset (Fin 36)),s.card = 27 ∧ ((G.induce s).isXYGraph 3 8) := by
+theorem R39_36_graph_has_R38_27 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9): ∃ (s : Finset (Fin 36)), s.card = 27 ∧ ((G.induce s).isXYGraph 3 8) := by
   use Gᶜ.neighborFinset 0
-  simp [SimpleGraph.degree_compl, R39_36_graph_IsRegular8 hxy 0]
-  simp[isXYGraph]
-  by_contra! absurd
-  simp [isXYGraph] at *
-  by_cases hclique : (induce (↑(Gᶜ.neighborFinset 0)) G).cliqueNum < 3
-  specialize absurd hclique
-  suffices (induce (↑(Gᶜ.neighborFinset 0)) G).indepNum ≤ G.cliqueNum - 1 by
-    omega
-  simp [indepNum, cliqueNum]
-  -- apply csInf_le
-  sorry
-  sorry
+  simp [SimpleGraph.degree_compl, R39_36_graph_IsRegular8 hxy 0, isXYGraph]
+  rw [Lemma₁, isXYGraph] at hxy
+  rw [← SimpleGraph.cliqueNum_compl, ← SimpleGraph.indepNum_compl, SimpleGraph.induce_compl]
+  -- NOTE: Could be generalized
+  have neighborSet_toFinset : Gᶜ.neighborSet 0 = ↑(Gᶜ.neighborSet 0).toFinset := by simp [SimpleGraph.neighborFinset]
+  apply And.intro
+  · apply Nat.lt_of_le_of_lt _ hxy.right
+    have indepNum_mono := Embedding.indepNum_mono (by simp [H₁]; apply Embedding.induce : (Gᶜ.H₁ 0) ↪g Gᶜ)
+    rw [H₁, neighborSet_toFinset] at indepNum_mono
+    assumption
+  · have H₁cn := H₁_cliqueNum_lt Gᶜ 0
+    rw [H₁, ← Nat.lt_iff_le_pred  Gᶜ.cliqueNum_pos, neighborSet_toFinset] at H₁cn
+    simp [SimpleGraph.neighborFinset]
+    apply Nat.lt_of_lt_of_le H₁cn
+    rw [Nat.le_iff_lt_add_one]
+    simp only [hxy.left]
 
 end SimpleGraph
