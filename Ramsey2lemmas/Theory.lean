@@ -803,32 +803,7 @@ theorem Corollary₂ (hxy : G.isXYGraph 3 y.succ) (iub : i ≤ RamseyOld 2 y.suc
   simp [-Set.toFinset_card, RamseyOld₂] at Prop₂ ⊢
   simp +arith [← Prop₂, Finset.filter_eq_empty_iff, G.H₁_eq_bot_of_3y hxy]
 
--- theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (vᵢ 3 y i) ∧ G.degree v = (vᵢ 3 y i)):
---   let p := Exists.choose h -- use classical.choose, is this bad?
---   haveI : DecidableRel (H₂ G p).Adj := by apply  instDecidableComapAdj
---   let e₂ := (H₂ G p).edgeFinset.card
---   e₂ ≤ (y - 1) * (N.succ / 2 - y + 1 + i):= by
---   sorry
-
--- theorem Prop₃ (hxy: G.isXYGraph 3 y) (h: ∃ u v: Fin N.succ, G.Adj u v ∧ G.degree u = (vᵢ 3 y i) ∧ G.degree v = (vᵢ 3 y i)):
---   let p := Exists.choose h -- use classical.choose, is this bad?
---   haveI : DecidableRel (H₂ G p).Adj := by apply  instDecidableComapAdj
---   let e₂ := (H₂ G p).edgeFinset.card
---   e₂ ≤ (y - 1) * (N.succ / 2 - y + 1 + i):= by
---   sorry
-
 noncomputable def e (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
-
---   let allGraphs : Finset (SimpleGraph (Fin N.succ)) := Finset.univ
---   haveI :  DecidablePred (fun (G : SimpleGraph (Fin (N.succ))) => G.isXYGraph x y) := by unfold isXYGraph; infer_instance
---   let xyGraphs := allGraphs.filter (fun(G : SimpleGraph (Fin (N.succ))) => G.isXYGraph x y )
-
---   let counts := xyGraphs.image (fun G => G.edgeSet.ncard)
-
---   if h : counts.Nonempty then
---     counts.min' h
---   else
---     0
 
 lemma exy0 : ∀ (x y : ℕ), e x y 0 = 0 := by
   intros x y
