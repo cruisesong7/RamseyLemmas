@@ -798,11 +798,6 @@ RamseyOld x y.succ * (N.succ - 2 * (RamseyOld x y.succ) + 2 * i) + ∑ j ∈ Fin
             simp [uprop.right, vprop.right] at padj
         next => aesop
 
-theorem Corollary₂ (hxy : G.isXYGraph 3 y.succ) (iub : i ≤ RamseyOld 2 y.succ) (hp: G.degree p = vᵢ 2 y i) : 2 * e₂ G p = ↑y * ((↑N.succ) - 2 * ↑y + 2 * ↑i) + ∑ j ∈ Finset.range (σ_G hxy).succ, (↑j : ℤ) * (2 * ↑ (tᵢ G 2 y j p) - ↑(sᵢ G 2 y j)) := by
-  have Prop₂ := Prop₂ i p hxy iub hp
-  simp [-Set.toFinset_card, RamseyOld₂] at Prop₂ ⊢
-  simp +arith [← Prop₂, Finset.filter_eq_empty_iff, G.H₁_eq_bot_of_3y hxy]
-
 noncomputable def e (x y N : ℕ) : ℕ := sInf {n : ℕ | ∃ (G : SimpleGraph (Fin N.succ)) (_ : DecidableRel G.Adj), G.isXYGraph x y ∧ G.edgeFinset.card = n}
 
 lemma exy0 : ∀ (x y : ℕ), e x y 0 = 0 := by
