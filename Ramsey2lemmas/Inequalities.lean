@@ -72,12 +72,15 @@ axiom e3_6_14_25 : e 3 6 14 ≥ 25
 axiom e3_6_15_32 : e 3 6 15 ≥ 32  --TODO: computation M
 axiom e3_6_16_40 : e 3 6 16 ≥ 40  --TODO: computation L
 
-lemma R38lb : 27 ∈ {N | ∃ G : SimpleGraph (Fin N), G.isXYGraph 3 8} := by
+lemma R38lb : 27 ∈ {N | ∃ G : SimpleGraph (Fin N), Nonempty (DecidableRel G.Adj) ∧ G.isXYGraph 3 8 } := by
   let G := readG6 "Z????CDO?a@PHA_HcE_dc`PCXQ@PoSWo@_cDS_YQQB_Qo?TLSO?q_g?{p?_?"
   use G
-  unfold SimpleGraph.isXYGraph
-  rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
-  native_decide
+  apply And.intro
+  · constructor
+    infer_instance
+  · unfold SimpleGraph.isXYGraph
+    rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
+    native_decide
 
 lemma e3_7_18_36 : e 3 7 18 ≥ 36 := by
   simp only [e]
@@ -301,7 +304,10 @@ theorem Ineq₁₀ (h : RamseyOld 3 8 > 27) : e 3 8 27 ≥ 88 := by
       apply isXYGraph_bddAbove
     · simp
       use 27
-      apply R38lb
+      have := R38lb
+      simp at this ⊢
+      obtain ⟨G, ⟨_, Gxy⟩⟩ := this
+      use G
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -361,7 +367,10 @@ e 3 8 28 ≥ 99 := by
       apply isXYGraph_bddAbove
     · simp
       use 27
-      apply R38lb
+      have := R38lb
+      simp at this
+      obtain ⟨G, ⟨_, Gxy⟩⟩ := this
+      use G
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -386,6 +395,11 @@ e 3 8 28 ≥ 99 := by
     simp at h1 h2 h3 ⊢
     nlinarith [e3_7_20_50, e3_7_21_59]
 
+lemma regular_of_isXY : ∀ (N : ℕ) (G : SimpleGraph (Fin N.succ)) [DecidableRel G.Adj], G.isXYGraph x.succ y.succ → N ≥ RamseyOld x y.succ + RamseyOld x.succ y → G.IsRegularOfDegree (RamseyOld x y.succ) := by
+  intros N G _ Gxy degbounds p
+  have := Lemma₂ G p Gxy
+  linarith
+
 theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGraph 3 9): G.edgeFinset.card ≥ 144 := by
   have σub := (Prop₁ hxy).2
   simp [RamseyOld₂ 8] at σub
@@ -397,13 +411,144 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
   have h3 := G_vertCount_eq G hxy
 
   have R38ub : RamseyOld 3 8 ≤ 29 := by
-    sorry --TODO: formalize the informal argument on pp.154
+    rw [← Nat.not_lt]
+    intro R38_30lb
+    simp [-exists_const, RamseyOld] at R38_30lb
+    rw [lt_csSup_iff] at R38_30lb
+    · obtain ⟨N, ⟨Nprop, Nlb⟩⟩ := R38_30lb
+      simp [Nat.lt_iff_add_one_le] at Nlb Nprop
+      obtain ⟨H, ⟨⟨_⟩, Hxy⟩⟩ := Nprop
+      obtain ⟨S, ⟨_, Scard⟩⟩ := @Finset.exists_subset_card_eq (Fin N) Finset.univ 30 (by simpa)
+      let I := (H.induce S).overFin (by simp; exact Scard)
+      have Ixy : I.isXYGraph 3 8 := by
+        simp [isXYGraph]
+        apply And.intro
+        · apply Nat.lt_of_le_of_lt _ Hxy.left
+          rw [← (SimpleGraph.overFinIso _ _).cliqueNum]
+          exact (@SimpleGraph.Embedding.induce (Fin N) H ↑S).cliqueNum_mono
+        · apply Nat.lt_of_le_of_lt _ Hxy.right
+          rw [← (SimpleGraph.overFinIso _ _).indepNum]
+          exact (@SimpleGraph.Embedding.induce (Fin N) H ↑S).indepNum_mono
+      haveI Idec : DecidableRel I.Adj := by
+        intro u v
+        simp [I, SimpleGraph.induce, SimpleGraph.overFin]
+        infer_instance
+      have Ireg := regular_of_isXY 29 I Ixy (by simp [RamseyOld₂]; linarith only [R37ub])
+      simp [RamseyOld₂] at Ireg
+      have H₂card : (Iᶜ.neighborFinset 0).card = 22 := by simp [I.degree_compl, Ireg 0]
+      have IH₂xy : ((I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).isXYGraph 3 7 := by
+        simp [isXYGraph] at Ixy ⊢
+        apply And.intro
+        · apply Nat.lt_of_le_of_lt _ Ixy.left
+          rw [← (SimpleGraph.overFinIso _ _).cliqueNum]
+          exact (SimpleGraph.Embedding.induce _).cliqueNum_mono
+        · have H₁cn := Iᶜ.H₁₂_iso 0
+          have obv : Iᶜᶜ.H₂ 0 ≃g I.H₂ 0 := ⟨⟨λ i ↦ ⟨i.val, by have := i.prop; simp_all⟩, λ i ↦ ⟨⟨i.val.val, by simp⟩, by have := i.prop; simp_all⟩, by simp [Function.LeftInverse], by simp [Function.LeftInverse, Function.RightInverse]⟩, by simp [H₂]⟩
+          have H₁₂nums := H₁cn.indepNum.trans obv.indepNum
+          simp at H₁₂nums
+          rw [← (SimpleGraph.overFinIso _ _).indepNum, ← H₁₂nums]
+          apply Nat.lt_of_le_of_lt (Iᶜ.H₁_cliqueNum_lt 0)
+          simp +arith
+          simp [Nat.le_iff_lt_add_one]
+          exact Ixy.right
+      have H₂elb := e3_7_21_59
+      simp [-Set.toFinset_card, e] at H₂elb
+      -- NOTE: Is this because of a lemma missing after the H₂ definition?
+      haveI : DecidableRel ((I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).Adj := by
+        intro u v
+        simp [SimpleGraph.overFin, H₂]
+        infer_instance
+      have IH₂edgeCardMem : ((I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).edgeFinset.card ∈ { n | ∃ (G : SimpleGraph (Fin 22)), G.isXYGraph 3 7 ∧ ∃ (_ : DecidableRel G.Adj), G.edgeFinset.card = n } := by
+        simp [-Set.toFinset_card]
+        use (I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)
+        simpa
+      have IH₂edgeCardlb := H₂elb.trans (Nat.sInf_le IH₂edgeCardMem)
+      have IH₂edgeCard56 : ((I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).edgeFinset.card = 56 := by
+        suffices epartition : I.edgeFinset.card = (∑ p ∈ I.neighborFinset 0, { d : I.Dart | d.toProd.1 = p }.toFinset.card) + I.e₂ 0 by
+          simp [-Set.toFinset_card, e₁, e₂] at epartition
+          have Ie : I.edgeFinset.card = 105 := by
+            rw [← Nat.mul_right_inj (by simp : 2 ≠ 0), ← I.sum_degrees_eq_twice_card_edges]
+            have Iereg := @Finset.sum_congr (Fin 30) ℕ Finset.univ Finset.univ _ (λ v ↦ I.degree v) (λ _ ↦ 7) rfl (by simp [Ireg.degree_eq])
+            simp at Iereg
+            simp [← Iereg]
+          have I0 : ∑ v ∈ I.neighborFinset 0, I.degree v = 49 := by simp [@Finset.sum_congr (Fin 30) ℕ (I.neighborFinset 0) (I.neighborFinset 0) _ (λ v ↦ I.degree v) (λ _ ↦ 7) rfl (by simp [Ireg.degree_eq]), Ireg 0]
+          simp +arith [-Set.toFinset_card, SimpleGraph.dart_fst_fiber_card_eq_degree, I0, Ie] at epartition
+          rw [← ((I.H₂ 0).overFinIso (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).card_edgeFinset_eq, epartition]
+        trans ((I.neighborFinset 0).biUnion (λ v ↦ I.incidenceFinset v) ∪ I.edgeFinset.filter (λ e ↦ ∀ v ∈ e, ¬I.Adj 0 v)).card
+        · apply Finset.card_nbij id
+          · simp
+            intro e emem
+            cases e.decBall (λ v ↦ ¬I.Adj 0 v) with
+            | isTrue adj0 =>
+              right
+              refine ⟨emem, adj0⟩
+            | isFalse notadj0 =>
+              simp at notadj0
+              left
+              obtain ⟨v, vine, adj0v⟩ := notadj0
+              use v
+              simp [SimpleGraph.incidenceSet]
+              refine ⟨adj0v, emem, vine⟩
+          · simp [id]
+          · intros e
+            simp
+            intro ecases
+            cases ecases with
+            | inl exe =>
+              obtain ⟨v, ⟨vadj0, ev⟩⟩ := exe
+              exact I.incidenceSet_subset _ ev
+            | inr h => exact h.left
+        · have disj1 : Disjoint ((I.neighborFinset 0).biUnion (λ v ↦ I.incidenceFinset v)) (I.edgeFinset.filter (λ e ↦ ∀ v ∈ e, ¬ I.Adj 0 v)) := by
+            simp [Finset.disjoint_iff_inter_eq_empty, Finset.eq_empty_iff_forall_notMem]
+            intros e v adj0v einc _
+            use v
+            simp [SimpleGraph.incidenceSet] at einc
+            refine ⟨einc.right, adj0v⟩
+          have disj2 : (I.neighborFinset 0).toSet.PairwiseDisjoint (λ v ↦ I.incidenceFinset v) := by
+            simp [Set.PairwiseDisjoint, Set.Pairwise, Function.onFun, Finset.disjoint_iff_inter_eq_empty, Finset.eq_empty_iff_forall_notMem]
+            intros u adj0u v adj0v uneqv e eincu eincv
+            have uvadj := I.adj_of_mem_incidenceSet uneqv eincu eincv
+            have clique3 : I.IsNClique 3 {0, u, v} := by simp [I.is3Clique_triple_iff]; refine ⟨adj0u, ⟨adj0v, uvadj⟩⟩
+            have cnle3 := clique3.isClique.card_le_cliqueNum
+            rw [clique3.card_eq] at cnle3
+            unfold isXYGraph at Ixy
+            cases (Nat.not_le_of_lt Ixy.left) cnle3
+          simp [-Set.toFinset_card, Finset.card_union_of_disjoint disj1, Finset.card_biUnion disj2, I.dart_fst_fiber_card_eq_degree, e₂, H₂]
+          apply Finset.card_bij (λ e emem ↦ e.pmap (λ v (vmem : v ∈ e) ↦ ⟨v, by simp at emem vmem; simp [← not_or]; intro vcases; cases vcases with | inl veq0 => have notadjother := emem.right _ (e.other_mem vmem); rw [← e.other_spec vmem, I.mem_edgeSet, veq0] at emem; rw [veq0] at notadjother; cases notadjother emem.left | inr adj0v => cases (emem.right _ vmem) adj0v⟩) (by simp))
+          · intro e emem
+            cases e with
+            | h u v =>
+              simp [Sym2.pmap_pair] at emem ⊢
+              exact emem.left
+          · intro e emem f fmem
+            cases e with
+            | h u v =>
+              cases f with
+              | h w z =>
+                simp [Sym2.pmap_pair]
+          · intro e emem
+            cases e with
+            | h u v =>
+              use s(u.val, v.val)
+              have uvprops := And.intro u.prop v.prop
+              simp only [SimpleGraph.mem_neighborSet, compl] at uvprops
+              simp [Sym2.pmap_pair] at emem ⊢
+              refine ⟨emem, uvprops.left.right, uvprops.right.right⟩
+      simp [IH₂edgeCard56] at IH₂edgeCardlb
+    · obtain ⟨N, Nprop⟩ := isXYGraph_bddAbove 3 8
+      simp [upperBounds] at Nprop
+      use N
+      simpa [upperBounds]
+    · have := R38lb
+      use 27
   have R38lb : RamseyOld 3 8 ≥ 27 := by
     simp[RamseyOld]
     apply le_csSup
-    apply isXYGraph_bddAbove
-    apply R38lb
-
+    · apply isXYGraph_bddAbove
+    · have := R38lb
+      simp at this ⊢
+      obtain ⟨G, ⟨_, Gxy⟩⟩ := this
+      use G
   interval_cases R38 : (RamseyOld 3 8)
 
   · norm_num at σub
