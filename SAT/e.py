@@ -37,14 +37,16 @@ if __name__ == "__main__":
 
         print("* #variable= %d #constraint= %d" % (res.n * (res.n - 1) // 2, len(pos_clauses) + len(neg_clauses) + 1))
 
+        if res.e is None:
+            print("min:", " ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]))
+        else:
+            print(" ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]), " >= -%d;" % res.e)
+
         for c in pos_clauses:
             print(" ".join(["+1 x%d" % l for l in c]), ">= 1;")
 
         for c in neg_clauses:
             print(" ".join(["+1 ~x%d" % l for l in c]), ">= 1;")
-
-        if res.e is not None:
-            print(" ".join(["-1 x%d" % eij(j, i) for i, j in itertools.combinations(list(range(res.n)), 2)]), " >= -%d;" % res.e)
     else:
         f = pysat.card.CardEnc.atmost([eij(e[1], e[0]) for e in itertools.combinations(list(range(res.n)), 2)], bound=res.e, encoding=res.enc) if res.e is not None else pysat.formula.CNF()
         f.extend(output_clauses(res.n, res.y, True))
