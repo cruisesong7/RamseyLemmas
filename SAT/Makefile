@@ -1,57 +1,11 @@
-3_7_19_35_enc_seqcounter.cnf:
-	python3 e.py --enc 1 3 7 19 35 > $@
-3_7_19_35_enc_sortnetwrk.cnf:
-	python3 e.py --enc 2 3 7 19 35 > $@
-3_7_19_35_enc_cardnetwrk.cnf:
-	python3 e.py --enc 3 3 7 19 35 > $@
-3_7_19_35_enc_totalizer.cnf:
-	python3 e.py --enc 6 3 7 19 35 > $@
-3_7_19_35_enc_mtotalizer.cnf:
-	python3 e.py --enc 7 3 7 19 35 > $@
-3_7_19_35_enc_kmtotalizer.cnf:
-	python3 e.py --enc 8 3 7 19 35 > $@
-3_7_19_35_enc_native.cnf:
-	python3 e.py --enc 9 3 7 19 35 > $@
-3_7_20_43_enc_seqcounter.cnf:
-	python3 e.py --enc 1 3 7 20 43 > $@
-3_7_20_43_enc_sortnetwrk.cnf:
-	python3 e.py --enc 2 3 7 20 43 > $@
-3_7_20_43_enc_cardnetwrk.cnf:
-	python3 e.py --enc 3 3 7 20 43 > $@
-3_7_20_43_enc_totalizer.cnf:
-	python3 e.py --enc 6 3 7 20 43 > $@
-3_7_20_43_enc_mtotalizer.cnf:
-	python3 e.py --enc 7 3 7 20 43 > $@
-3_7_20_43_enc_kmtotalizer.cnf:
-	python3 e.py --enc 8 3 7 20 43 > $@
-3_7_20_43_enc_native.cnf:
-	python3 e.py --enc 9 3 7 20 43 > $@
-3_7_21_49_enc_seqcounter.cnf:
-	python3 e.py --enc 1 3 7 21 49 > $@
-3_7_21_49_enc_sortnetwrk.cnf:
-	python3 e.py --enc 2 3 7 21 49 > $@
-3_7_21_49_enc_cardnetwrk.cnf:
-	python3 e.py --enc 3 3 7 21 49 > $@
-3_7_21_49_enc_totalizer.cnf:
-	python3 e.py --enc 6 3 7 21 49 > $@
-3_7_21_49_enc_mtotalizer.cnf:
-	python3 e.py --enc 7 3 7 21 49 > $@
-3_7_21_49_enc_kmtotalizer.cnf:
-	python3 e.py --enc 8 3 7 21 49 > $@
-3_7_21_49_enc_native.cnf:
-	python3 e.py --enc 9 3 7 21 49 > $@
-3_7_22_58_enc_seqcounter.cnf:
-	python3 e.py --enc 1 3 7 22 58 > $@
-3_7_22_58_enc_sortnetwrk.cnf:
-	python3 e.py --enc 2 3 7 22 58 > $@
-3_7_22_58_enc_cardnetwrk.cnf:
-	python3 e.py --enc 3 3 7 22 58 > $@
-3_7_22_58_enc_totalizer.cnf:
-	python3 e.py --enc 6 3 7 22 58 > $@
-3_7_22_58_enc_mtotalizer.cnf:
-	python3 e.py --enc 7 3 7 22 58 > $@
-3_7_22_58_enc_kmtotalizer.cnf:
-	python3 e.py --enc 8 3 7 22 58 > $@
-3_7_22_58_enc_native.cnf:
-	python3 e.py --enc 9 3 7 22 58 > $@
-all: 3_7_19_35_enc_seqcounter.cnf 3_7_19_35_enc_sortnetwrk.cnf 3_7_19_35_enc_cardnetwrk.cnf 3_7_19_35_enc_totalizer.cnf 3_7_19_35_enc_mtotalizer.cnf 3_7_19_35_enc_kmtotalizer.cnf 3_7_19_35_enc_native.cnf 3_7_20_43_enc_seqcounter.cnf 3_7_20_43_enc_sortnetwrk.cnf 3_7_20_43_enc_cardnetwrk.cnf 3_7_20_43_enc_totalizer.cnf 3_7_20_43_enc_mtotalizer.cnf 3_7_20_43_enc_kmtotalizer.cnf 3_7_20_43_enc_native.cnf 3_7_21_49_enc_seqcounter.cnf 3_7_21_49_enc_sortnetwrk.cnf 3_7_21_49_enc_cardnetwrk.cnf 3_7_21_49_enc_totalizer.cnf 3_7_21_49_enc_mtotalizer.cnf 3_7_21_49_enc_kmtotalizer.cnf 3_7_21_49_enc_native.cnf 3_7_22_58_enc_seqcounter.cnf 3_7_22_58_enc_sortnetwrk.cnf 3_7_22_58_enc_cardnetwrk.cnf 3_7_22_58_enc_totalizer.cnf 3_7_22_58_enc_mtotalizer.cnf 3_7_22_58_enc_kmtotalizer.cnf 3_7_22_58_enc_native.cnf
+3_6_12.opb: e.py
+	python3 e.py --pb 3 6 12 > $@
+
+3_6_12_sym.opb: ppr2veripb.py 3_6_12.opb 3_6_12.ppr
+	cp 3_6_12.opb $@
+	python3 ppr2veripb.py 3_6_12.ppr >/dev/null 2>>$@
+
+3_6_12_sym_proof.opb: ppr2veripb.py 3_6_12.ppr
+	python3 ppr2veripb.py 3_6_12.ppr >$@ 2>/dev/null
+
+all: 3_6_12.opb 3_6_12_sym.opb 3_6_12_sym_proof.opb
