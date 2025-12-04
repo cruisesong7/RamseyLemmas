@@ -12,3 +12,8 @@ lean_lib «Ramsey2lemmas» where
 require mathlib from git "https://github.com/leanprover-community/mathlib4"@"v4.21.0"
 
 require formal_ramsey from git "https://github.com/cruisesong7/formal_ramsey"@"c1ec6fc"
+
+require checkdecls from git "https://github.com/PatrickMassot/checkdecls.git"
+
+require «doc-gen4» from git
+  "https://github.com/leanprover/doc-gen4" @ "v4.21.0"
