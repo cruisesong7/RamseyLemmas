@@ -34,7 +34,7 @@ jobs:
         run: ~/.elan/bin/lake exe cache get || true
 
       - name: Build project
-        run: ~/.elan/bin/lake build STIR
+        run: ~/.elan/bin/lake build Ramsey2lemmas
 
       - name: Cache mathlib API docs
         uses: actions/cache@v4
@@ -48,12 +48,12 @@ jobs:
             .lake/build/doc/declarations
             .lake/build/doc/find
             .lake/build/doc/*.*
-            !.lake/build/doc/declarations/declaration-data-STIR*
+            !.lake/build/doc/declarations/declaration-data-Ramsey2lemmas*
           key: MathlibDoc-${{ hashFiles('lake-manifest.json') }}
           restore-keys: MathlibDoc-
 
       - name: Build project API documentation
-        run: ~/.elan/bin/lake -R -Kenv=dev build STIR:docs
+        run: ~/.elan/bin/lake -R -Kenv=dev build Ramsey2lemmas:docs
       
       - name: Check for `home_page` folder # this is meant to detect a Jekyll-based website
         id: check_home_page
@@ -67,7 +67,7 @@ jobs:
           fi
 
       - name: Build blueprint and copy to `home_page/blueprint`
-        uses: xu-cheng/texlive-action@v2
+        uses: xu-cheng/texlive-action@v3
         with:
           docker_image: ghcr.io/xu-cheng/texlive-full:20231201
           run: |
