@@ -6,3 +6,21 @@
     \uses{def:indepNum, def:cliqueNum}
     $G$ is an $(x,y)$-graph if $x > C(G)$ and $y > I(G)$.
 \end{definition}
+
+\begin{definition}[Ramsey Number]
+    \label{def:ramseynumber}
+    \lean{Ramsey2lemmas.RamseyOld}
+    \uses{def:xyGraph}
+    $$
+    R(x,y) = \max \{ n \in \mathbb{N} \mid \exists G \text{, } G \text{ is an} (x, y)\text{-graph } \land \text{ } |V(G)| = n \}
+    $$
+
+\begin{lemma}[Graver Lemma 2]
+    \label{l:ramseydegrees}
+    \lean{Ramsey2lemmas.Lemma₂}
+    For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
+    \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
+\end{lemma}
+
+\begin{proof}
+\end{proof}
