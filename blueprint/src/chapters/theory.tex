@@ -2,14 +2,14 @@
 
 \begin{definition}[$(x,y)$-graphs]
     \label{def:xyGraph}
-    \lean{isXYGraph}
+    \lean{SimpleGraph.isXYGraph}
     \uses{def:indepNum, def:cliqueNum}
     $G$ is an $(x,y)$-graph if $x > C(G)$ and $y > I(G)$.
 \end{definition}
 
 \begin{definition}[Ramsey Number]
     \label{def:ramseynumber}
-    \lean{RamseyOld}
+    \lean{SimpleGraph.RamseyOld}
     \uses{def:xyGraph}
     $$
     R(x,y) = \max \{ n \in \mathbb{N} \mid \exists G \text{, } G \text{ is an} (x, y)\text{-graph } \land \text{ } |V(G)| = n \}
@@ -18,7 +18,7 @@
 
 \begin{lemma}[Graver Lemma 2]
     \label{l:ramseydegrees}
-    \lean{Lemma₂}
+    \lean{SimpleGraph.Lemma₂}
     For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
     \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
 \end{lemma}
