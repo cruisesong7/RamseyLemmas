@@ -1,0 +1,149 @@
+\chapter{SimpleGraph}
+
+\begin{lemma}[induce\_compl]
+    \label{l:induce_compl}
+    \lean{SimpleGraph.induce_compl}
+    \leanok
+\end{lemma}
+
+\begin{theorem}[IsIndepSet.subset]
+    \label{thm:IsIndepSet.subset}
+    \lean{SimpleGraph.IsIndepSet.subset}
+    \leanok
+\end{theorem}
+
+\begin{theorem}[isNIndepSet\_one]
+    \label{thm:isNIndepSet_one}
+    \lean{SimpleGraph.isNIndepSet_one}
+    \leanok
+\end{theorem}
+
+\begin{lemma}[IsClique]
+    \label{l:IsClique}
+    \lean{SimpleGraph.Iso.IsClique}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[IsIndepSet]
+    \label{l:IsIndepSet}
+    \lean{SimpleGraph.Iso.IsIndepSet}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[IsNClique]
+    \label{l:IsNClique}
+    \lean{SimpleGraph.Iso.IsNClique}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[IsNIndepSet]
+    \label{l:IsNIndepSet}
+    \lean{SimpleGraph.Iso.IsNIndepSet}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[cliqueNum]
+    \label{l:cliqueNum}
+    \lean{SimpleGraph.Iso.cliqueNum}
+    \leanok
+    \uses{l:IsNClique}
+\end{lemma}
+
+\begin{lemma}[indepNum]
+    \label{l:indepNum}
+    \lean{SimpleGraph.Iso.indepNum}
+    \leanok
+    \uses{l:IsNIndepSet}
+\end{lemma}
+
+\begin{definition}[compl]
+    \label{def:compl}
+    \lean{SimpleGraph.Iso.compl}
+    \leanok
+\end{definition}
+
+\begin{lemma}[fintype\_cliqueNum\_bddAbove]
+    \label{l:fintype_cliqueNum_bddAbove}
+    \lean{SimpleGraph.fintype_cliqueNum_bddAbove}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[fintype\_indepNum\_bddAbove]
+    \label{l:fintype_indepNum_bddAbove}
+    \lean{SimpleGraph.fintype_indepNum_bddAbove}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[cliqueNum\_pos]
+    \label{l:cliqueNum_pos}
+    \lean{SimpleGraph.cliqueNum_pos}
+    \leanok
+    \uses{l:fintype_cliqueNum_bddAbove}
+\end{lemma}
+
+\begin{lemma}[indepNum\_pos]
+    \label{l:indepNum_pos}
+    \lean{SimpleGraph.indepNum_pos}
+    \leanok
+    \uses{l:fintype_indepNum_bddAbove}
+\end{lemma}
+
+\begin{lemma}[cliqueNum\_top]
+    \label{l:cliqueNum_top}
+    \lean{SimpleGraph.cliqueNum_top}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[cliqueNum\_bot]
+    \label{l:cliqueNum_bot}
+    \lean{SimpleGraph.cliqueNum_bot}
+    \leanok
+    \uses{l:cliqueNum_pos}
+\end{lemma}
+
+\begin{lemma}[indepNum\_bot]
+    \label{l:indepNum_bot}
+    \lean{SimpleGraph.indepNum_bot}
+    \leanok
+    \uses{l:cliqueNum_top}
+\end{lemma}
+
+\begin{lemma}[indepNum\_top]
+    \label{l:indepNum_top}
+    \lean{SimpleGraph.indepNum_top}
+    \leanok
+    \uses{l:cliqueNum_bot}
+\end{lemma}
+
+\begin{lemma}[exists\_isNClique\_of\_le\_cliqueNum]
+    \label{l:exists_isNClique_of_le_cliqueNum}
+    \lean{SimpleGraph.exists_isNClique_of_le_cliqueNum}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[exists\_isNIndset\_of\_le\_indepNum]
+    \label{l:exists_isNIndset_of_le_indepNum}
+    \lean{SimpleGraph.exists_isNIndset_of_le_indepNum}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[cliqueNum\_lt\_iff\_cliqueFree]
+    \label{l:cliqueNum_lt_iff_cliqueFree}
+    \lean{SimpleGraph.cliqueNum_lt_iff_cliqueFree}
+    \leanok
+    \uses{l:exists_isNClique_of_le_cliqueNum}
+\end{lemma}
+
+\begin{lemma}[indepNum\_mono]
+    \label{l:indepNum_mono}
+    \lean{SimpleGraph.Embedding.indepNum_mono}
+    \leanok
+    \uses{l:fintype_indepNum_bddAbove}
+\end{lemma}
+
+\begin{lemma}[cliqueNum\_mono]
+    \label{l:cliqueNum_mono}
+    \lean{SimpleGraph.Embedding.cliqueNum_mono}
+    \leanok
+    \uses{l:fintype_cliqueNum_bddAbove}
+\end{lemma}
