@@ -1,0 +1,41 @@
+\chapter{Sym2}
+
+\begin{definition}[toOrderedPair]
+    \label{def:toOrderedPair}
+    \lean{Sym2.toOrderedPair}
+    \leanok
+\end{definition}
+
+\begin{lemma}[exists_mem_pair]
+    \label{l:exists_mem_pair}
+    \lean{Sym2.exists_mem_pair}
+    \leanok
+\end{lemma}
+
+\begin{lemma}[toOrderedPair_repr]
+    \label{l:toOrderedPair_repr}
+    \lean{Sym2.toOrderedPair_repr}
+    \leanok
+    \uses{def:toOrderedPair}
+\end{lemma}
+
+\begin{lemma}[toOrderedPair_inj]
+    \label{l:toOrderedPair_inj}
+    \lean{Sym2.toOrderedPair_inj}
+    \leanok
+    \uses{def:toOrderedPair, l:toOrderedPair_repr}
+\end{lemma}
+
+\begin{lemma}[toOrderedPair_IsDiag_of_eq]
+    \label{l:toOrderedPair_IsDiag_of_eq}
+    \lean{Sym2.toOrderedPair_IsDiag_of_eq}
+    \leanok
+    \uses{def:toOrderedPair}
+\end{lemma}
+
+\begin{lemma}[isDiag_of_subsingleton]
+    \label{l:isDiag_of_subsingleton}
+    \lean{Sym2.isDiag_of_subsingleton}
+    \leanok
+\end{lemma}
+
