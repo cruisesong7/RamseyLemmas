@@ -1,0 +1,52 @@
+\chapter{Bron–Kerbosch Algorithm}
+
+\begin{lemma}[length\_wf]
+    \label{l:length_wf}
+    \lean{List.length_wf}
+    \leanok
+\end{lemma}
+
+\begin{definition}[Bron\_Kerbosch\_full]
+    \label{def:Bron_Kerbosch_full}
+    \lean{SimpleGraph.Bron_Kerbosch_full}
+    \leanok
+\end{definition}
+
+\begin{lemma}[Bron_Kerbosch\_maximal\_clique]
+    \label{l:Bron_Kerbosch_maximal_clique}
+    \lean{SimpleGraph.Bron_Kerbosch_maximal_clique}
+    \leanok
+    \uses{l:length_wf, def:Bron_Kerbosch_full}
+\end{lemma}
+
+\begin{definition}[Bron\_Kerbosch]
+    \label{def:Bron_Kerbosch}
+    \lean{SimpleGraph.Bron_Kerbosch}
+    \leanok
+    \uses{def:Bron_Kerbosch_full}
+\end{definition}
+
+\begin{lemma}[Bron\_Kerbosch\_correct]
+    \label{l:Bron_Kerbosch_correct}
+    \lean{SimpleGraph.Bron_Kerbosch_correct}
+    \leanok
+    \uses{def:Bron_Kerbosch}
+\end{lemma}
+
+\begin{lemma}[Bron\_Kerbosch\_maximum\_clique]
+    \label{l:Bron_Kerbosch_maximum_clique}
+    \lean{SimpleGraph.Bron_Kerbosch_maximum_clique}
+    \leanok
+    \uses{def:Bron_Kerbosch, l:Bron_Kerbosch_correct}
+\end{lemma}
+
+\begin{lemma}[Bron\_Kerbosch\_cliqueNum]
+    \label{l:Bron_Kerbosch_cliqueNum}
+    \lean{SimpleGraph.Bron_Kerbosch_cliqueNum}
+    \leanok
+    \uses{def:Bron_Kerbosch, l:Bron_Kerbosch_correct}
+\end{lemma}
+
+
+
+
