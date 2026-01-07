@@ -3,25 +3,52 @@
 \begin{definition}[$(x,y)$-graphs]
     \label{def:xyGraph}
     \lean{SimpleGraph.isXYGraph}
-    \uses{def:indepNum, def:cliqueNum}
+    \leanok
+    % \uses{def:indepNum, def:cliqueNum}
     $G$ is an $(x,y)$-graph if $x > C(G)$ and $y > I(G)$.
 \end{definition}
 
 \begin{definition}[Ramsey Number]
     \label{def:ramseynumber}
     \lean{SimpleGraph.RamseyOld}
+    \leanok
     \uses{def:xyGraph}
     $$
     R(x,y) = \max \{ n \in \mathbb{N} \mid \exists G \text{, } G \text{ is an} (x, y)\text{-graph } \land \text{ } |V(G)| = n \}
     $$
 \end{definition}
 
+\begin{lemma}[Graver Lemma 1]
+    \label{l:Lemma1}
+    \lean{SimpleGraph.Lemma₁}
+    \leanok
+    \uses{def:xyGraph}
+    $G$ is an $(x,y)$-graph if and only if its complement $G^c$ is a $(y,x)$-graph.
+\end{lemma}
+
+\begin{theorm}[noXYGraphIffRamseyGraphProp]
+    \label{l:noXYGraphIffRamseyGraphProp}
+    \lean{SimpleGraph.noXYGraphIffRamseyGraphProp}
+    \leanok
+    \uses{def:xyGraph}
+\end{lemma}
+
+\begin{lemma}[isXYGraph_bddAbove]
+    \label{l:isXYGraph_bddAbove}
+    \lean{SimpleGraph.isXYGraph_bddAbove}
+    \leanok
+\end{lemma}
+
+\begin{lemma[cardLERamseyOld]}
+    \label{l:cardLERamseyOld}
+    \lean{SimpleGraph.cardLERamseyOld}
+    \leanok
+\end{lemma}
+
 \begin{lemma}[Graver Lemma 2]
-    \label{l:ramseydegrees}
+    \label{l:Lemma2}
     \lean{SimpleGraph.Lemma₂}
+    \leanok
     For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
     \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
 \end{lemma}
-
-\begin{proof}
-\end{proof}
