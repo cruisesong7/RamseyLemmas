@@ -25,30 +25,116 @@
     \uses{def:xyGraph}
     $G$ is an $(x,y)$-graph if and only if its complement $G^c$ is a $(y,x)$-graph.
 \end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{theorem}[noXYGraphIffRamseyGraphProp]
-    \label{l:noXYGraphIffRamseyGraphProp}
+    \label{thm:noXYGraphIffRamseyGraphProp}
     \lean{SimpleGraph.noXYGraphIffRamseyGraphProp}
     \leanok
-    \uses{def:xyGraph}
+    \uses{def:xyGraph, l:exists_isNClique_of_le_cliqueNum, l:exists_isNIndset_of_le_indepNum}
 \end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{lemma}[isXYGraph\_bddAbove]
     \label{l:isXYGraph_bddAbove}
     \lean{SimpleGraph.isXYGraph_bddAbove}
     \leanok
 \end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
 
 \begin{lemma}[cardLERamseyOld]
     \label{l:cardLERamseyOld}
     \lean{SimpleGraph.cardLERamseyOld}
     \leanok
+    \uses{def:xyGraph, l:isXYGraph_bddAbove, l:cliqueNum, l:indepNum}
 \end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[R3y\_neighbor\_Ind]
+    \label{l:R3y_neighbor_Ind}
+    \lean{SimpleGraph.R3y_neighbor_Ind}
+    \leanok
+    \uses{def:xyGraph, l:cliqueNum_lt_iff_cliqueFree}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}[GraphRamsey2RamseyOld]
+    \label{thm:GraphRamsey2RamseyOld}
+    \lean{SimpleGraph.GraphRamsey2RamseyOld}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, thm:noXYGraphIffRamseyGraphProp, l:cliqueNum, l:indepNum, l:isXYGraph_bddAbove}
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}[RamseyOld_2]
+    \label{thm:RamseyOld₂}
+    \lean{SimpleGraph.RamseyOld₂}
+    \leanok
+    \uses{def:ramseynumber, thm:GraphRamsey2RamseyOld}
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}[$σ(G)$]
+    \label{def:σ_G}
+    \lean{SimpleGraph.σ_G}
+    \leanok
+    \uses{def:ramseynumber}
+\end{definition}
+
+\begin{lemma}[sum\_degree\_eq\_sum\_over\_degrees]
+    \label{l:sum_degree_eq_sum_over_degrees}
+    \lean{SimpleGraph.sum_degree_eq_sum_over_degrees}
+    \leanok
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[num\_of\_vertices\_eq\_sum\_over\_degrees]
+    \label{l:num_of_vertices_eq_sum_over_degrees}
+    \lean{SimpleGraph.num_of_vertices_eq_sum_over_degrees}
+    \leanok
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}[$H_1$]
+    \label{def:H₁}
+    \lean{SimpleGraph.H₁}
+    \leanok
+\end{definition}
+
+\begin{definition}[$H_2$]
+    \label{def:H₂}
+    \lean{SimpleGraph.H₂}
+    \leanok
+\end{definition}
 
 \begin{lemma}[Graver Lemma 2]
     \label{l:Lemma2}
     \lean{SimpleGraph.Lemma₂}
     \leanok
+    \uses{def:xyGraph, }
     For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
     \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
 \end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+
