@@ -8,7 +8,7 @@
     $G$ is an $(x,y)$-graph if $x > C(G)$ and $y > I(G)$.
 \end{definition}
 
-\begin{definition}[Ramsey Number]
+\begin{definition}[Ramsey Number (Graver's version)]
     \label{def:ramseynumber}
     \lean{SimpleGraph.RamseyOld}
     \leanok
@@ -18,7 +18,7 @@
     $$
 \end{definition}
 
-\begin{lemma}[Graver Lemma 1]
+\begin{lemma}[Graver's Lemma 1]
     \label{l:Lemma1}
     \lean{SimpleGraph.Lemma₁}
     \leanok
@@ -33,7 +33,7 @@
     \label{thm:noXYGraphIffRamseyGraphProp}
     \lean{SimpleGraph.noXYGraphIffRamseyGraphProp}
     \leanok
-    \uses{def:xyGraph, l:exists_isNClique_of_le_cliqueNum, l:exists_isNIndset_of_le_indepNum}
+    \uses{def:xyGraph, l:exists_isNClique_of_le_cliqueNum, l:induce_compl}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -78,7 +78,7 @@
     \leanok
 \end{proof}
 
-\begin{theorem}[RamseyOld_2]
+\begin{theorem}[RamseyOld\_2]
     \label{thm:RamseyOld₂}
     \lean{SimpleGraph.RamseyOld₂}
     \leanok
@@ -125,16 +125,111 @@
     \leanok
 \end{definition}
 
-\begin{lemma}[Graver Lemma 2]
-    \label{l:Lemma2}
-    \lean{SimpleGraph.Lemma₂}
+\begin{definition}[$H_1 H_2$ isomorphic]
+    \label{def:H₁₂_iso}
+    \lean{SimpleGraph.H₁₂_iso}
     \leanok
-    \uses{def:xyGraph, }
-    For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
-    \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
+    \uses{def:H₁, def:H₂}
+\end{definition}
+
+\begin{lemma}[$H_1$\_eq\_bot\_of\_3y]
+    \label{l:H₁_eq_bot_of_3y}
+    \lean{SimpleGraph.H₁_eq_bot_of_3y}
+    \leanok
+    \uses{def:H₁, def:xyGraph}
 \end{lemma}
 \begin{proof}
     \leanok
 \end{proof}
 
+\begin{lemma}[$H_1$\_cliqueNum\_lt]
+    \label{l:H₁_cliqueNum_lt}
+    \lean{SimpleGraph.H₁_cliqueNum_lt}
+    \leanok
+    \uses{def:H₁, l:cliqueNum_pos}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
 
+\begin{theorem}[Graver Lemma 2]
+    \label{thm:Lemma₂}
+    \lean{SimpleGraph.Lemma₂}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:H₁, l:indepNum_mono, l:H₁_cliqueNum_lt, l:cliqueNum_pos, l:indepNum_pos}
+    For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
+    \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[G\_degreeCount\_eq]
+    \label{l:G_degreeCount_eq}
+    \lean{SimpleGraph.G_degreeCount_eq}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:sum_degree_eq_sum_over_degrees, thm:Lemma₂}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[G\_vertCount\_eq]
+    \label{l:G_vertCount_eq}
+    \lean{SimpleGraph.G_vertCount_eq}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:num_of_vertices_eq_sum_over_degrees, thm:Lemma₂}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[$H_1$\_degreeCount\_eq]
+    \label{l:H₁_degreeCount_eq}
+    \lean{SimpleGraph.H₁_degreeCount_eq}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[$H_1$\_vertCount\_eq]
+    \label{l:H₁_vertCount_eq}
+    \lean{SimpleGraph.H₁_vertCount_eq}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}[Graver's Prop 1]
+    \label{thm:Prop₁}
+    \lean{SimpleGraph.Prop₁}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[$v_ᵢ$\_deg\_swap]
+    \label{l:vᵢ_deg_swap}
+    \lean{SimpleGraph.vᵢ_deg_swap}
+    \leanok
+    \uses{def:xyGraph, def:σ_G, thm:Lemma₂}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}[Graver's Prop 2]
+    \label{thm:Prop₂}
+    \lean{SimpleGraph.Prop₂}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:H₁, def:H₂, def:toOrderedPair, l:toOrderedPair_repr, l:exists_mem_pair, l:toOrderedPair_inj, l:toOrderedPair_IsDiag_of_eq}
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
