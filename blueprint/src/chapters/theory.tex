@@ -18,13 +18,13 @@
     $$
 \end{definition}
 
-\begin{lemma}[Graver's Lemma 1]
-    \label{l:Lemma1}
+\begin{theorem}[Graver's Lemma 1]
+    \label{thm:Lemma₁}
     \lean{SimpleGraph.Lemma₁}
     \leanok
     \uses{def:xyGraph}
     $G$ is an $(x,y)$-graph if and only if its complement $G^c$ is a $(y,x)$-graph.
-\end{lemma}
+\end{theorem}
 \begin{proof}
     \leanok
 \end{proof}
@@ -88,6 +88,25 @@
     \leanok
 \end{proof}
 
+\begin{definition}[$v_i$]
+    \label{abb:vᵢ}
+    \lean{SimpleGraph.vᵢ}
+    \leanok
+    \uses{def: ramseynumber}
+\end{definition}
+
+\begin{definition}[$s_i$]
+    \label{abb:sᵢ}
+    \lean{SimpleGraph.sᵢ}
+    \leanok
+\end{definition}
+
+\begin{definition}[$t_i$]
+    \label{abb:tᵢ}
+    \lean{SimpleGraph.tᵢ}
+    \leanok
+\end{definition}
+
 \begin{definition}[$σ(G)$]
     \label{def:σ_G}
     \lean{SimpleGraph.σ_G}
@@ -125,6 +144,20 @@
     \leanok
 \end{definition}
 
+\begin{definition}[$e_1$]
+    \label{abb:e₁}
+    \lean{SimpleGraph.e₁}
+    \leanok
+    \uses{def:H₁}
+\end{definition}
+
+\begin{definition}[$e_2$]
+    \label{abb:e₂}
+    \lean{SimpleGraph.e₂}
+    \leanok
+    \uses{def:H₂}
+\end{definition}
+
 \begin{definition}[$H_1 H_2$ isomorphic]
     \label{def:H₁₂_iso}
     \lean{SimpleGraph.H₁₂_iso}
@@ -156,7 +189,7 @@
     \label{thm:Lemma₂}
     \lean{SimpleGraph.Lemma₂}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:H₁, l:indepNum_mono, l:H₁_cliqueNum_lt, l:cliqueNum_pos, l:indepNum_pos}
+    \uses{def:xyGraph, def:ramseynumber, def:H₁, l:indepNum_mono, l:H₁_cliqueNum_lt, l:cliqueNum_pos, l:indepNum_pos, thm:Lemma₁}
     For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
     \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
 \end{theorem}
@@ -168,7 +201,7 @@
     \label{l:G_degreeCount_eq}
     \lean{SimpleGraph.G_degreeCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:sum_degree_eq_sum_over_degrees, thm:Lemma₂}
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:sum_degree_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -178,7 +211,7 @@
     \label{l:G_vertCount_eq}
     \lean{SimpleGraph.G_vertCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:num_of_vertices_eq_sum_over_degrees, thm:Lemma₂}
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:num_of_vertices_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -188,7 +221,7 @@
     \label{l:H₁_degreeCount_eq}
     \lean{SimpleGraph.H₁_degreeCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂, abb:tᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -198,7 +231,7 @@
     \label{l:H₁_vertCount_eq}
     \lean{SimpleGraph.H₁_vertCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂, abb:vᵢ, abb;tᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -218,7 +251,7 @@
     \label{l:vᵢ_deg_swap}
     \lean{SimpleGraph.vᵢ_deg_swap}
     \leanok
-    \uses{def:xyGraph, def:σ_G, thm:Lemma₂}
+    \uses{def:xyGraph, def:σ_G, thm:Lemma₂,abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -228,7 +261,44 @@
     \label{thm:Prop₂}
     \lean{SimpleGraph.Prop₂}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:H₁, def:H₂, def:toOrderedPair, l:toOrderedPair_repr, l:exists_mem_pair, l:toOrderedPair_inj, l:toOrderedPair_IsDiag_of_eq}
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:H₁, def:H₂,abb:e₁,abb:e₂,abb:sᵢ,abb:vᵢ,abb:tᵢ, inst:decBex, def:toOrderedPair, l:toOrderedPair_repr, l:exists_mem_pair, l:toOrderedPair_inj, l:toOrderedPair_IsDiag_of_eq}
+\end{theorem}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{definition}[$e$]
+    \label{def:e}
+    \lean{SimpleGraph.e}
+    \leanok
+    \uses{def:xyGraph}
+\end{definition}
+
+\begin{lemma}[exy0]
+    \label{l:exy0}
+    \lean{SimpleGraph.exy0}
+    \leanok
+    \uses{def:xyGraph, def:e, l:cliqueNum_pos, l:isDiag_of_subsingleton}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{lemma}[$e_2$\_ge\_e]
+    \label{l:e₂_ge_e}
+    \lean{SimpleGraph.e₂_ge_e}
+    \leanok
+    \uses{def:xyGraph, def:e, abb:e₂, l:cliqueNum, l:indepNum, l:cliqueNum_mono, l:indepNum_pos, l:H₁_cliqueNum_lt, l:exy0}
+\end{lemma}
+\begin{proof}
+    \leanok
+\end{proof}
+
+\begin{theorem}[Graver's Prop 4]
+    \label{thm:Prop₄}
+    \lean{SimpleGraph.Prop₄}
+    \leanok
+    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:e, abb:vᵢ, abb:sᵢ, abb:e₂, thm:Lemma₂, def:H₂, thm:RamseyOld₂, l:vᵢ_deg_swap}
 \end{theorem}
 \begin{proof}
     \leanok
