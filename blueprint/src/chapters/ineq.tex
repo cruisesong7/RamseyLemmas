@@ -13,7 +13,7 @@
     \label{l:σ_helper}
     \lean{SimpleGraph.σ_helper}
     \leanok
-    \uses{def:σ_G, def:xyGraph, thm:RamseyOld₂, abb:vᵢ}
+    \uses{def:σ_G, def:isXYGraph, thm:RamseyOld₂, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -23,7 +23,7 @@
     \label{l:sᵢ_vanish}
     \lean{SimpleGraph.sᵢ_vanish}
     \leanok
-    \uses{def:σ_G, def:xyGraph, def:ramseynumber, thm:RamseyOld₂, thm:Lemma₂, abb:vᵢ}
+    \uses{def:σ_G, def:isXYGraph, def:RamseyOld, thm:RamseyOld₂, thm:Lemma₂, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -33,14 +33,14 @@
     \label{thm:R36ub}
     \lean{SimpleGraph.R36ub}
     \leanok
-    \uses{def:ramseynumber}
+    \uses{def:RamseyOld}
 \end{theorem}
 
 \begin{theorem}[R36]
     \label{thm:R36}
     \lean{SimpleGraph.R36}
     \leanok
-    \uses{def:ramseynumber, l:isXYGraph_bddAbove, thm:R36ub, l:Bron_Kerbosch_cliqueNum}
+    \uses{def:RamseyOld, l:isXYGraph_bddAbove, thm:R36ub, l:Bron_Kerbosch_cliqueNum}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -50,14 +50,14 @@
     \label{thm:R37ub}
     \lean{SimpleGraph.R37ub}
     \leanok
-    \uses{def:ramseynumber}
+    \uses{def:RamseyOld}
 \end{theorem}
 
 \begin{theorem}[R37]
     \label{thm:R37}
     \lean{SimpleGraph.R37}
     \leanok
-    \uses{def:ramseynumber, l:isXYGraph_bddAbove, thm:R37ub, l:Bron_Kerbosch_cliqueNum}
+    \uses{def:RamseyOld, l:isXYGraph_bddAbove, thm:R37ub, l:Bron_Kerbosch_cliqueNum}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -109,7 +109,7 @@
     \label{l:R38lb}
     \lean{SimpleGraph.R38lb}
     \leanok
-    \uses{def:ramseynumber, l:Bron_Kerbosch_cliqueNum}
+    \uses{def:RamseyOld, l:Bron_Kerbosch_cliqueNum}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -119,7 +119,7 @@
     \label{l:e3_7_18_36}
     \lean{SimpleGraph.e3_7_18_36}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum,thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_11_11, thm:e3_6_12_15, thm:e3_6_13_20, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum,thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_11_11, thm:e3_6_12_15, thm:e3_6_13_20, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -136,7 +136,7 @@
     \label{l:e3_7_20_50}
     \lean{SimpleGraph.e3_7_20_50}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum,thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_13_20, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum,thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_13_20, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -146,7 +146,7 @@
     \label{l:e3_7_21_59}
     \lean{SimpleGraph.e3_7_21_59}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -156,7 +156,7 @@
     \label{l:e3_7_21_59}
     \lean{SimpleGraph.e3_7_21_59}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R36, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_6_14_25, thm:e3_6_15_32, thm:e3_6_16_40}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -166,7 +166,7 @@
     \label{thm:Ineq₉}
     \lean{SimpleGraph.Ineq₉}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_18_36, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_18_36, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -176,7 +176,7 @@
     \label{thm:Ineq₉}
     \lean{SimpleGraph.Ineq₉}
     \leanok
-    \uses{def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_18_36, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
+    \uses{def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:Bron_Kerbosch_cliqueNum, thm:Lemma₂, thm:RamseyOld₂, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_18_36, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -186,7 +186,7 @@
     \label{thm:Ineq₁₀}
     \lean{SimpleGraph.Ineq₁₀}
     \leanok
-    \uses{def:ramseynumber, def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:cliqueNum, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R38lb, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
+    \uses{def:RamseyOld, def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:cliqueNum, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R38lb, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:e3_7_19_44, l:e3_7_20_50, l:e3_7_21_59}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -196,7 +196,7 @@
     \label{thm:Ineq₁₁}
     \lean{SimpleGraph.Ineq₁₁}
     \leanok
-    \uses{def:ramseynumber, def:xyGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:cliqueNum, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R38lb, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_20_50, l:e3_7_21_59}
+    \uses{def:RamseyOld, def:isXYGraph, def:e, def:σ_G, abb:vᵢ, abb:sᵢ, l:cliqueNum, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R38lb, thm:R37, thm:Prop₄, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, l:e3_7_20_50, l:e3_7_21_59}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -206,7 +206,7 @@
     \label{l:regular_of_isXY}
     \lean{SimpleGraph.regular_of_isXY}
     \leanok
-    \uses{def:ramseynumber, thm:Lemma₂}
+    \uses{def:RamseyOld, thm:Lemma₂}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -216,7 +216,7 @@
     \label{thm:R39Ineq}
     \lean{SimpleGraph.R39Ineq}
     \leanok
-    \uses{def:ramseynumber, def:xyGraph, def:e, def:σ_G, def:H₁₂_iso, def:H₂, inst:decBall, abb:vᵢ, abb:sᵢ, abb:e₁, abb:e₂, l:isXYGraph_bddAbove, l:cliqueNum, l:H₁_cliqueNum_lt, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R37ub, l:R38lb, thm:Prop₄,thm:Prop₁, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:Ineq₉, thm:Ineq₁₀, thm:Ineq₁₁}
+    \uses{def:RamseyOld, def:isXYGraph, def:e, def:σ_G, def:H₁₂_iso, def:H₂, inst:decBall, abb:vᵢ, abb:sᵢ, abb:e₁, abb:e₂, l:isXYGraph_bddAbove, l:cliqueNum, l:H₁_cliqueNum_lt, l:cliqueNum_mono, l:indepNum, l:indepNum_mono, thm:Lemma₂, thm:RamseyOld₂, l:R37ub, l:R38lb, thm:Prop₄,thm:Prop₁, l:G_degreeCount_eq, l:G_vertCount_eq, l:σ_helper, l:sᵢ_vanish, thm:Ineq₉, thm:Ineq₁₀, thm:Ineq₁₁}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -226,7 +226,7 @@
     \label{thm:R39_36_graph_IsRegular8}
     \lean{SimpleGraph.R39_36_graph_IsRegular8}
     \leanok
-    \uses{def:xyGraph, l:R3y_neighbor_Ind, l:fintype_indepNum_bddAbove, thm:R39Ineq}
+    \uses{def:isXYGraph, l:R3y_neighbor_Ind, l:fintype_indepNum_bddAbove, thm:R39Ineq}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -236,7 +236,7 @@
     \label{thm:R39_36_graph_has_R38_27}
     \lean{SimpleGraph.R39_36_graph_has_R38_27}
     \leanok
-    \uses{def:xyGraph, def:H₁, thm:Lemma₁, l:indepNum_mono, l:cliqueNum_pos, l:H₁_cliqueNum_lt l:fintype_indepNum_bddAbove, thm:R39Ineq}
+    \uses{def:isXYGraph, def:H₁, thm:Lemma₁, l:indepNum_mono, l:cliqueNum_pos, l:H₁_cliqueNum_lt l:fintype_indepNum_bddAbove, thm:R39Ineq, thm:R39_36_graph_IsRegular8}
 \end{theorem}
 \begin{proof}
     \leanok

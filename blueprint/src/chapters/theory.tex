@@ -1,7 +1,7 @@
 \chapter{Ramsey Theory}
 
 \begin{definition}[$(x,y)$-graphs]
-    \label{def:xyGraph}
+    \label{def:isXYGraph}
     \lean{SimpleGraph.isXYGraph}
     \leanok
     % \uses{def:indepNum, def:cliqueNum}
@@ -9,10 +9,10 @@
 \end{definition}
 
 \begin{definition}[Ramsey Number (Graver's version)]
-    \label{def:ramseynumber}
+    \label{def:RamseyOld}
     \lean{SimpleGraph.RamseyOld}
     \leanok
-    \uses{def:xyGraph}
+    \uses{def:isXYGraph}
     $$
     R(x,y) = \max \{ n \in \mathbb{N} \mid \exists G \text{, } G \text{ is an} (x, y)\text{-graph } \land \text{ } |V(G)| = n \}
     $$
@@ -22,7 +22,7 @@
     \label{thm:Lemma₁}
     \lean{SimpleGraph.Lemma₁}
     \leanok
-    \uses{def:xyGraph}
+    \uses{def:isXYGraph}
     $G$ is an $(x,y)$-graph if and only if its complement $G^c$ is a $(y,x)$-graph.
 \end{theorem}
 \begin{proof}
@@ -33,7 +33,7 @@
     \label{thm:noXYGraphIffRamseyGraphProp}
     \lean{SimpleGraph.noXYGraphIffRamseyGraphProp}
     \leanok
-    \uses{def:xyGraph, l:exists_isNClique_of_le_cliqueNum, l:induce_compl, l:exists_isNIndset_of_le_indepNum}
+    \uses{def:isXYGraph, l:exists_isNClique_of_le_cliqueNum, l:induce_compl, l:exists_isNIndset_of_le_indepNum}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -52,7 +52,7 @@
     \label{l:cardLERamseyOld}
     \lean{SimpleGraph.cardLERamseyOld}
     \leanok
-    \uses{def:xyGraph, l:isXYGraph_bddAbove, l:cliqueNum, l:indepNum}
+    \uses{def:isXYGraph, l:isXYGraph_bddAbove, l:cliqueNum, l:indepNum}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -62,7 +62,7 @@
     \label{l:R3y_neighbor_Ind}
     \lean{SimpleGraph.R3y_neighbor_Ind}
     \leanok
-    \uses{def:xyGraph, l:cliqueNum_lt_iff_cliqueFree}
+    \uses{def:isXYGraph, l:cliqueNum_lt_iff_cliqueFree}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -72,7 +72,7 @@
     \label{thm:GraphRamsey2RamseyOld}
     \lean{SimpleGraph.GraphRamsey2RamseyOld}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, thm:noXYGraphIffRamseyGraphProp, l:cliqueNum, l:indepNum, l:isXYGraph_bddAbove}
+    \uses{def:isXYGraph, def:RamseyOld, thm:noXYGraphIffRamseyGraphProp, l:cliqueNum, l:indepNum, l:isXYGraph_bddAbove}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -82,7 +82,7 @@
     \label{thm:RamseyOld₂}
     \lean{SimpleGraph.RamseyOld₂}
     \leanok
-    \uses{def:ramseynumber, thm:GraphRamsey2RamseyOld}
+    \uses{def:RamseyOld, thm:GraphRamsey2RamseyOld}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -92,7 +92,7 @@
     \label{abb:vᵢ}
     \lean{SimpleGraph.vᵢ}
     \leanok
-    \uses{def: ramseynumber}
+    \uses{def: RamseyOld}
 \end{definition}
 
 \begin{definition}[$s_i$]
@@ -111,7 +111,7 @@
     \label{def:σ_G}
     \lean{SimpleGraph.σ_G}
     \leanok
-    \uses{def:ramseynumber}
+    \uses{def:RamseyOld}
 \end{definition}
 
 \begin{lemma}[sum\_degree\_eq\_sum\_over\_degrees]
@@ -169,7 +169,7 @@
     \label{l:H₁_eq_bot_of_3y}
     \lean{SimpleGraph.H₁_eq_bot_of_3y}
     \leanok
-    \uses{def:H₁, def:xyGraph}
+    \uses{def:H₁, def:isXYGraph}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -189,7 +189,7 @@
     \label{thm:Lemma₂}
     \lean{SimpleGraph.Lemma₂}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:H₁, l:indepNum_mono, l:H₁_cliqueNum_lt, l:cliqueNum_pos, l:indepNum_pos, thm:Lemma₁}
+    \uses{def:isXYGraph, def:RamseyOld, def:H₁, l:indepNum_mono, l:H₁_cliqueNum_lt, l:cliqueNum_pos, l:indepNum_pos, thm:Lemma₁}
     For any $(x,y,n)$-graph $G$, every vertex $v$ in $G$ satisfies 
     \[(n - 1) - R(x,y - 1) \leq deg(v) \leq R(x - 1, y)\].
 \end{theorem}
@@ -201,7 +201,7 @@
     \label{l:G_degreeCount_eq}
     \lean{SimpleGraph.G_degreeCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:sum_degree_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, l:sum_degree_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -211,7 +211,7 @@
     \label{l:G_vertCount_eq}
     \lean{SimpleGraph.G_vertCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, l:num_of_vertices_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, l:num_of_vertices_eq_sum_over_degrees, thm:Lemma₂, abb:sᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -221,7 +221,7 @@
     \label{l:H₁_degreeCount_eq}
     \lean{SimpleGraph.H₁_degreeCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂, abb:tᵢ, abb:vᵢ}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, thm:Lemma₂, abb:tᵢ, abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -231,7 +231,7 @@
     \label{l:H₁_vertCount_eq}
     \lean{SimpleGraph.H₁_vertCount_eq}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂, abb:vᵢ, abb;tᵢ}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, thm:Lemma₂, abb:vᵢ, abb;tᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -241,7 +241,7 @@
     \label{thm:Prop₁}
     \lean{SimpleGraph.Prop₁}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, thm:Lemma₂}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, thm:Lemma₂}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -251,7 +251,7 @@
     \label{l:vᵢ_deg_swap}
     \lean{SimpleGraph.vᵢ_deg_swap}
     \leanok
-    \uses{def:xyGraph, def:σ_G, thm:Lemma₂,abb:vᵢ}
+    \uses{def:isXYGraph, def:σ_G, thm:Lemma₂,abb:vᵢ}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -261,7 +261,7 @@
     \label{thm:Prop₂}
     \lean{SimpleGraph.Prop₂}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:H₁, def:H₂,abb:e₁,abb:e₂,abb:sᵢ,abb:vᵢ,abb:tᵢ, inst:decBex, def:toOrderedPair, l:toOrderedPair_repr, l:exists_mem_pair, l:toOrderedPair_inj, l:toOrderedPair_IsDiag_of_eq}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, def:H₁, def:H₂,abb:e₁,abb:e₂,abb:sᵢ,abb:vᵢ,abb:tᵢ, inst:decBex, def:toOrderedPair, l:toOrderedPair_repr, l:exists_mem_pair, l:toOrderedPair_inj, l:toOrderedPair_IsDiag_of_eq}
 \end{theorem}
 \begin{proof}
     \leanok
@@ -271,14 +271,14 @@
     \label{def:e}
     \lean{SimpleGraph.e}
     \leanok
-    \uses{def:xyGraph}
+    \uses{def:isXYGraph}
 \end{definition}
 
 \begin{lemma}[exy0]
     \label{l:exy0}
     \lean{SimpleGraph.exy0}
     \leanok
-    \uses{def:xyGraph, def:e, l:cliqueNum_pos, l:isDiag_of_subsingleton}
+    \uses{def:isXYGraph, def:e, l:cliqueNum_pos, l:isDiag_of_subsingleton}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -288,7 +288,7 @@
     \label{l:e₂_ge_e}
     \lean{SimpleGraph.e₂_ge_e}
     \leanok
-    \uses{def:xyGraph, def:e, abb:e₂, l:cliqueNum, l:indepNum, l:cliqueNum_mono, l:indepNum_pos, l:H₁_cliqueNum_lt, l:exy0}
+    \uses{def:isXYGraph, def:e, abb:e₂, l:cliqueNum, l:indepNum, l:cliqueNum_mono, l:indepNum_pos, l:H₁_cliqueNum_lt, l:exy0}
 \end{lemma}
 \begin{proof}
     \leanok
@@ -298,7 +298,7 @@
     \label{thm:Prop₄}
     \lean{SimpleGraph.Prop₄}
     \leanok
-    \uses{def:xyGraph, def:ramseynumber, def:σ_G, def:e, abb:vᵢ, abb:sᵢ, abb:e₂, thm:Lemma₂, def:H₂, thm:RamseyOld₂, l:vᵢ_deg_swap}
+    \uses{def:isXYGraph, def:RamseyOld, def:σ_G, def:e, abb:vᵢ, abb:sᵢ, abb:e₂, thm:Lemma₂, def:H₂, thm:RamseyOld₂, l:vᵢ_deg_swap}
 \end{theorem}
 \begin{proof}
     \leanok
