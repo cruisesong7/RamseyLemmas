@@ -6,35 +6,9 @@ import Trestle.Upstream.ToStd
 
 namespace List
 
-lemma length_wf {α : Type} : WellFounded (λ (x y : List α) ↦ x.length < y.length) := by
-  suffices acc_len : ∀ (n : ℕ) (l : List α), l.length ≤ n → Acc (λ (x y : List α) ↦ x.length < y.length) l by
-    constructor
-    intro l
-    apply acc_len l.length
-    simp
-  intro n
-  induction n with
-  | zero =>
-    simp
-    constructor
-    intros y yltx
-    simp at yltx
-  | succ m ih =>
-    intros l
-    cases l with
-    | nil =>
-      simp
-      constructor
-      intros y yltx
-      simp at yltx
-    | cons h t =>
-      simp
-      intros tlen
-      constructor
-      intros y ylen
-      simp [Nat.lt_add_one_iff] at ylen
-      apply ih
-      trans t.length <;> assumption
+-- By Kenny Lau
+-- https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/List.20length.20induction/near/554091009
+theorem length_wf {α : Type} : WellFounded (λ (x y : List α) ↦ x.length < y.length) := InvImage.wf _ Nat.lt_wfRel.2
 
 end List
 
@@ -110,7 +84,7 @@ lemma Bron_Kerbosch_maximal_clique {α : Type} [Fintype α] [deceq : DecidableEq
           rw [G.adj_comm] at unotadjv
           cases unotadjv (TClique (RsubT (by simp; exact uinR)) vinT (Ne.intro vnequ).symm)
       | cons v X' =>
-        simp [Bron_Kerbosch_full, Finset.empty, Maximal, Set.subset_def] at Radj ⊢
+        simp [Bron_Kerbosch_full, Maximal, Set.subset_def] at Radj ⊢
         intros RsubS SsubR Sclique
         rw [← subset_antisymm RsubS SsubR]
         use (insert v R.toFinset)
@@ -127,7 +101,7 @@ lemma Bron_Kerbosch_maximal_clique {α : Type} [Fintype α] [deceq : DecidableEq
             exact RX.left
     | cons v P' =>
       simp [Bron_Kerbosch_full] at Radj ⊢
-      rw [ih (P'.filter (λ u ↦ decide (G.Adj u v))) (by simp [Nat.lt_add_one_iff, List.length_filter_le]) (by simp at Pnd; apply List.Pairwise.filter; exact Pnd.right) (by simp [List.Disjoint] at RP ⊢; intros a ainR ainP'; cases (RP ainR).right ainP' : (v :: R).Disjoint (P'.filter (λ u ↦ decide (G.Adj u v)))) (by simp [List.Disjoint]; intros _ ainR ainX; cases RX ainR ainX : (v :: R).Disjoint (X.filter (λ u ↦ decide (G.Adj u v)))) (by simp [List.Disjoint] at PX ⊢; intros a ainP' _ ainX; cases (PX.right a ainP') ainX) (by simp [-List.coe_toFinset, Rclique]; have vadj := Radj v; simp at vadj; intros u uinR; simp [vadj u uinR]) (by simp; intros u; rw [← or_and_right, and_comm]; simp [← Radj u]; intros uv ueqv; simp [ueqv] at uv) S]
+      rw [ih (P'.filter (λ u ↦ decide (G.Adj u v))) (by simp [List.length_filter_le]) (by simp at Pnd; apply List.Pairwise.filter; exact Pnd.right) (by simp [List.Disjoint] at RP ⊢; intros a ainR ainP'; cases (RP ainR).right ainP' : (v :: R).Disjoint (P'.filter (λ u ↦ decide (G.Adj u v)))) (by simp [List.Disjoint]; intros _ ainR ainX; cases RX ainR ainX : (v :: R).Disjoint (X.filter (λ u ↦ decide (G.Adj u v)))) (by simp [List.Disjoint] at PX ⊢; intros a ainP' _ ainX; cases (PX.right a ainP') ainX) (by simp [-List.coe_toFinset, Rclique]; have vadj := Radj v; simp at vadj; intros u uinR; simp [vadj u uinR]) (by simp; intros u; rw [← or_and_right, and_comm]; simp [← Radj u]; intros uv ueqv; simp [ueqv] at uv) S]
       rw [ih P' (by simp) (by simp at Pnd; exact Pnd.right) (by simp at RP; exact RP.right : R.Disjoint P') (by simp at RP ⊢; simp [RP.left, RX] : R.Disjoint (v :: X)) (by simp at Pnd PX ⊢; simp [Pnd.left, PX.right]) Rclique (by simp; exact Radj) S]
       rw [← and_assoc, ← and_assoc, ← and_assoc, ← or_and_right]
       simp [Finset.subset_iff]
@@ -155,7 +129,7 @@ lemma Bron_Kerbosch_maximal_clique {α : Type} [Fintype α] [deceq : DecidableEq
           apply And.intro
           · simp [vinS]
             intros u uinR
-            exact SProp.left uinR
+            exact SProp.left _ uinR
           · intros u uinS
             cases deceq u v with
             | isTrue ueqv =>
@@ -221,10 +195,7 @@ lemma Bron_Kerbosch_cliqueNum {α : Type} [FinEnum α] (G : SimpleGraph α) [Dec
       · intros S SMal
         rw [← Bron_Kerbosch_correct] at SMal
         exact SMal.left.card_le_cliqueNum
-  -- NOTE: This line will change in v4.23.0-rc1 so let's leave the try in for now
-  rw [← List.max?_eq_some_iff] at cliqueNumMem <;> try simp
-  · simp [cliqueNumMem]
-  · intros a b
-    exact Nat.le_total b a
+  rw [← List.max?_eq_some_iff] at cliqueNumMem
+  simp [cliqueNumMem]
 
 end SimpleGraph
