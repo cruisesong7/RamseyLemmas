@@ -19,7 +19,7 @@ lemma σ_helper {N x y k : ℕ} {G : SimpleGraph (Fin N.succ)} [DecidableRel G.A
   intros f fvanish
   apply Finset.sum_subset
   · simpa
-  · simp [σ_G, RamseyOld₂, vᵢ]
+  · simp
     intros d dlt σd
     exact fvanish d dlt σd
 
@@ -39,7 +39,7 @@ lemma sᵢ_vanish {N x y : ℕ} {G : SimpleGraph (Fin N.succ)} [DecidableRel G.A
     simp [vdeg] at vdegpos
     symm at vdeg
     simp [Nat.sub_eq_iff_eq_add (Nat.le_of_lt vdegpos)] at vdeg
-    simp [vdeg, Nat.add_one_le_iff, Nat.sub_add_comm (G.minDegree_le_degree v), RamseyOld₂] at σltd
+    simp [vdeg, Nat.sub_add_comm (G.minDegree_le_degree v)] at σltd
 
 axiom R36ub : RamseyOld 3 6 ≤ 17 --TODO: computation K or R
 
@@ -64,6 +64,8 @@ theorem R37 : RamseyOld 3 7 = 22 := by
   unfold SimpleGraph.isXYGraph
   simp [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
   native_decide
+
+set_option maxHeartbeats 50000000
 
 axiom e3_6_11_11 : e 3 6 11 ≥ 11 --TODO: the proof start in pp.163 Appendix B
 axiom e3_6_12_15 : e 3 6 12 ≥ 15
@@ -94,7 +96,6 @@ lemma e3_7_18_36 : e 3 7 18 ≥ 36 := by
       rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
       native_decide
     · use (by infer_instance)
-      simp [readG6Header]
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -108,9 +109,9 @@ lemma e3_7_18_36 : e 3 7 18 ≥ 36 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (18 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp[R36])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (18 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp[R36])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 6; assumption; simp [R36])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_six, vᵢ, RamseyOld₂ 6] at h1
@@ -133,7 +134,6 @@ lemma e3_7_20_50 : e 3 7 20 ≥ 50 := by
       rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
       native_decide
     · use (by infer_instance)
-      simp [readG6Header]
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -147,9 +147,9 @@ lemma e3_7_20_50 : e 3 7 20 ≥ 50 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (20 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R36])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R36])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R36])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (20 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R36])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R36])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp [R36])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_four, vᵢ, RamseyOld₂ 6] at h1
@@ -170,7 +170,6 @@ lemma e3_7_21_59 : e 3 7 21 ≥ 59 := by
       rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
       native_decide
     · use (by infer_instance)
-      simp [readG6Header]
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -184,9 +183,9 @@ lemma e3_7_21_59 : e 3 7 21 ≥ 59 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (21 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp[R36])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R36])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R36])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 6 (21 - vᵢ 2 6 d - 1) + (vᵢ 2 6 d)^2) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp[R36])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R36])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 6 d) * (G.sᵢ 2 6 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R36])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂ 6] at h1
@@ -207,7 +206,6 @@ theorem Ineq₉: e 3 8 26 ≥ 80 := by
       rw [G.Bron_Kerbosch_cliqueNum, ← G.cliqueNum_compl, Gᶜ.Bron_Kerbosch_cliqueNum]
       native_decide
     · use (by infer_instance)
-      simp [readG6Header]
   · simp [-Set.toFinset_card]
     intros _ G GisXY _ cardeqe
     rw [← cardeqe]
@@ -221,9 +219,9 @@ theorem Ineq₉: e 3 8 26 ≥ 80 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (26 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (26 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 4; assumption; simp[R37])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_four, vᵢ, RamseyOld₂ 7] at h1
@@ -242,7 +240,7 @@ theorem Ineq₁₀ (h : RamseyOld 3 8 > 27) : e 3 8 27 ≥ 88 := by
       obtain ⟨V, ⟨Vsub, Vcard⟩⟩ := hn
       use (G.induce V).edgeFinset.card
       simp [-Set.toFinset_card] at Vcard ⊢
-      rw [← @Fintype.card_ofFinset (Fin n) V.toSet V (by simp)] at Vcard
+      rw [← @Fintype.card_ofFinset (Fin n) V V (by simp)] at Vcard
       use (G.induce V).overFin Vcard
       apply And.intro
       · simp [SimpleGraph.isXYGraph] at hG ⊢
@@ -256,12 +254,11 @@ theorem Ineq₁₀ (h : RamseyOld 3 8 > 27) : e 3 8 27 ≥ 88 := by
           exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).indepNum_mono
       · use (by intros u v; simp [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).symm.map_adj_iff]; apply Gdec)
         simp [-Set.toFinset_card]
-        haveI : DecidableRel ((G.induce V).overFin Vcard).Adj := by
+        letI toldyou : DecidableRel ((G.induce V).overFin Vcard).Adj := by
           intros u v
           simp [SimpleGraph.overFin]
           apply Gdec
         simp [← @SimpleGraph.Iso.card_edgeFinset_eq (Fin 28) ((G.induce V).overFin Vcard) ↑V (G.induce V) (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 28 Vcard).symm _ _]
-        congr
     · simp
       apply isXYGraph_bddAbove
     · simp
@@ -283,9 +280,9 @@ theorem Ineq₁₀ (h : RamseyOld 3 8 > 27) : e 3 8 27 ≥ 88 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (27 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (27 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 3; assumption; simp [R37])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂ 7] at h1
@@ -305,7 +302,7 @@ e 3 8 28 ≥ 99 := by
       obtain ⟨V, ⟨Vsub, Vcard⟩⟩ := hn
       use (G.induce V).edgeFinset.card
       simp [-Set.toFinset_card] at Vcard ⊢
-      rw [← @Fintype.card_ofFinset (Fin n) V.toSet V (by simp)] at Vcard
+      rw [← @Fintype.card_ofFinset (Fin n) V V (by simp)] at Vcard
       use (G.induce V).overFin Vcard
       apply And.intro
       · simp [SimpleGraph.isXYGraph] at hG ⊢
@@ -319,12 +316,11 @@ e 3 8 28 ≥ 99 := by
           exact (@SimpleGraph.Embedding.induce (Fin n) G ↑V).indepNum_mono
       · use (by intros u v; simp [← (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).symm.map_adj_iff]; apply Gdec)
         simp [-Set.toFinset_card]
-        haveI : DecidableRel ((G.induce V).overFin Vcard).Adj := by
+        letI : DecidableRel ((G.induce V).overFin Vcard).Adj := by
           intros u v
           simp [SimpleGraph.overFin]
           apply Gdec
         simp [← @SimpleGraph.Iso.card_edgeFinset_eq (Fin 29) ((G.induce V).overFin Vcard) ↑V (G.induce V) (@SimpleGraph.overFinIso ↑↑V (G.induce V) _ 29 Vcard).symm _ _]
-        congr
     · simp
       apply isXYGraph_bddAbove
     · simp
@@ -346,9 +342,9 @@ e 3 8 28 ≥ 99 := by
       assumption
     have h2 := G_degreeCount_eq G GisXY
     have h3 := G_vertCount_eq G GisXY
-    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (28 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
-    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
-    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    have bilinearlb := σ_helper GisXY σub (λ d ↦ (e 3 7 (28 - vᵢ 2 7 d - 1) + (vᵢ 2 7 d)^2) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    have vertexlb := σ_helper GisXY σub (λ d ↦  1 * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
+    have degreelb := σ_helper GisXY σub (λ d ↦ (vᵢ 2 7 d) * (G.sᵢ 2 7 d)) (by simp only []; intros; apply sᵢ_vanish GisXY _ 2; assumption; simp [R37])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂ 7] at h1
@@ -427,7 +423,7 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
       have IH₂edgeCardlb := H₂elb.trans (Nat.sInf_le IH₂edgeCardMem)
       have IH₂edgeCard56 : ((I.H₂ 0).overFin (by simp [-Fintype.card_ofFinset, -SimpleGraph.mem_neighborSet]; exact H₂card)).edgeFinset.card = 56 := by
         suffices epartition : I.edgeFinset.card = (∑ p ∈ I.neighborFinset 0, { d : I.Dart | d.toProd.1 = p }.toFinset.card) + I.e₂ 0 by
-          simp [-Set.toFinset_card, e₁, e₂] at epartition
+          simp [-Set.toFinset_card, e₂] at epartition
           have Ie : I.edgeFinset.card = 105 := by
             rw [← Nat.mul_right_inj (by simp : 2 ≠ 0), ← I.sum_degrees_eq_twice_card_edges]
             have Iereg := @Finset.sum_congr (Fin 30) ℕ Finset.univ Finset.univ _ (λ v ↦ I.degree v) (λ _ ↦ 7) rfl (by simp [Ireg.degree_eq])
@@ -445,7 +441,7 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
               right
               refine ⟨emem, adj0⟩
             | isFalse notadj0 =>
-              simp at notadj0
+              simp at notadj0 ⊢
               left
               obtain ⟨v, vine, adj0v⟩ := notadj0
               use v
@@ -466,7 +462,7 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
             use v
             simp [SimpleGraph.incidenceSet] at einc
             refine ⟨einc.right, adj0v⟩
-          have disj2 : (I.neighborFinset 0).toSet.PairwiseDisjoint (λ v ↦ I.incidenceFinset v) := by
+          have disj2 : (SetLike.coe (I.neighborFinset 0)).PairwiseDisjoint (λ v ↦ I.incidenceFinset v) := by
             simp [Set.PairwiseDisjoint, Set.Pairwise, Function.onFun, Finset.disjoint_iff_inter_eq_empty, Finset.eq_empty_iff_forall_notMem]
             intros u adj0u v adj0v uneqv e eincu eincv
             have uvadj := I.adj_of_mem_incidenceSet uneqv eincu eincv
@@ -512,15 +508,14 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
       obtain ⟨G, ⟨_, Gxy⟩⟩ := this
       use G
   interval_cases R38 : (RamseyOld 3 8)
-
   · norm_num at σub
     norm_num [σub, RamseyOld₂ 8, Finset.range, -Set.toFinset_card] at h1 h2 h3
     nlinarith [Ineq₉]
   · norm_num at σub
     replace σub := Nat.lt_succ_of_le σub
-    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
-    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
-    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
+    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 2; assumption; simp [R38])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_two, vᵢ, RamseyOld₂ 8] at h1
@@ -530,9 +525,9 @@ theorem R39Ineq {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] (hxy: G.isXYGrap
     nlinarith [Ineq₉, Ineq₁₀ (by simp [R38])]
   · norm_num at σub
     replace σub := Nat.lt_succ_of_le σub
-    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
-    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
-    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only [Finset.filter_eq_empty_iff]; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    have bilinearlb := σ_helper hxy σub (λ d ↦ (e 3 8 (35 - vᵢ 2 8 d - 1) + (vᵢ 2 8 d)^2) * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    have vertexlb := σ_helper hxy σub (λ d ↦  1 * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
+    have degreelb := σ_helper hxy σub (λ d ↦ (vᵢ 2 8 d) * (G.sᵢ 2 8 d)) (by simp only []; intros; apply sᵢ_vanish hxy _ 3; assumption; simp [R38])
     simp at bilinearlb vertexlb degreelb
     -- NOTE: Using simp here maxes out hearbeats
     simp_rw [bilinearlb, Finset.sum_range, Fin.sum_univ_three, vᵢ, RamseyOld₂ 8] at h1
@@ -572,7 +567,7 @@ theorem R39_36_graph_has_R38_27 {G : SimpleGraph (Fin 36)} [DecidableRel G.Adj] 
   rw [Lemma₁, isXYGraph] at hxy
   rw [← SimpleGraph.cliqueNum_compl, ← SimpleGraph.indepNum_compl, SimpleGraph.induce_compl]
   -- NOTE: Could be generalized
-  have neighborSet_toFinset : Gᶜ.neighborSet 0 = ↑(Gᶜ.neighborSet 0).toFinset := by simp [SimpleGraph.neighborFinset]
+  have neighborSet_toFinset : Gᶜ.neighborSet 0 = ↑(Gᶜ.neighborSet 0).toFinset := by simp
   apply And.intro
   · apply Nat.lt_of_le_of_lt _ hxy.right
     have indepNum_mono := Embedding.indepNum_mono (by simp [H₁]; apply Embedding.induce : (Gᶜ.H₁ 0) ↪g Gᶜ)
